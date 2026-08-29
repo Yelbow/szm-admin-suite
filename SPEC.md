@@ -16,3 +16,7 @@
 - "only the default site health can stay" — op het custom dashboard mag alleen de Site Health widget van de defaults blijven.
 - Plugin Recommendations vaste starterlijst: "voor nu yoast seo, yoast duplicator, en sucuri security. meer voegen we later wel toe."
 - Theme vs white-label grens: "Yes, that split" → theme module = kleur/typografie/layout/presets; white-label = logo, footer tekst, login achtergrond.
+- Bugreport 2026-08-29: white-label "doesnt seem to allow select and saving all roles, same goes for all declulette items 'Hide all defaults below' logo and image choose buttons dont work."
+- Rollen: "roles we can better do some sort of selectt, from 'role' and up maybe something like that." → minimale-rol-select per module.
+- Thema's: "and give me cyberpunk and a kawaii theme already".
+- Thema's: "also make a goth baddie theme and be sure to check all themes for background color/text& icon color combinations becasue i see a lot of mistakes that are unreadable."

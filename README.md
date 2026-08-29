@@ -11,6 +11,8 @@ One WordPress plugin, many modules — a Jetpack-style plugin for client sites t
 | **Declutter** | `declutter` | Hides the default dashboard widgets (At a Glance, Activity, Quick Draft, WordPress news). Site Health always stays. | On |
 | **White-label** | `white-label` | Client identity: logo, admin footer text, login background. | Off (nothing set) |
 
+**Admin themes bundled:** `midnight` (dark deep-space), `cyberpunk` (neon magenta/cyan on purple-black), `kawaii` (pastel pink, rounded corners), `goth-baddie` (dark plum black, crimson + mauve). Every theme is contrast-checked (WCAG AA: 4.5:1 text, 3:1 icons) and works on any admin color scheme. Switch them in Admin Suite → Admin Theme, or drop your own folder into `inc/themes/`.
+
 Menu-restriction and visitor stats are explicitly **not** in v1 (see `SPEC.md`).
 
 ## Install
@@ -21,11 +23,11 @@ Copy the `szm-admin-suite` folder into `wp-content/plugins/` (repo root is the p
 
 Manage everything under the top-level **Admin Suite** menu:
 
-- **Modules** tab — master on/off per module, plus which roles each module applies to (leave roles empty for everyone, including administrators).
+- **Modules** tab — master on/off per module, plus a minimum-role dropdown (the selected role and every role above it; "All roles" applies it to everyone, including administrators).
 - One tab per module with its own settings:
   - **Admin Theme** — pick the active theme.
-  - **Declutter** — choose which default dashboard widgets to hide.
-  - **White-label** — set logo, footer text, login background (with media picker).
+  - **Declutter** — tick which default dashboard widgets to hide (untick everything to show all defaults; Site Health is never touched).
+  - **White-label** — set logo, footer text, login background (with working media picker).
 
 ## Plugin Recommendations
 

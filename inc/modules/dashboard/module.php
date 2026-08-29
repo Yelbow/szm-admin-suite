@@ -55,6 +55,10 @@ function szm_as_dashboard_boot() {
 /**
  * Remove default dashboard widgets except Site Health, then add the
  * Welcome + Plugin Recommendations widgets.
+ *
+ * Site Health is never touched: WP 7.1's add_meta_box() refuses to re-add a
+ * core box that was removed ("If a core box was previously removed, don't
+ * add"), so removing it and re-adding it would silently fail.
  */
 function szm_as_dashboard_setup() {
 	$to_remove = array(
@@ -63,31 +67,13 @@ function szm_as_dashboard_setup() {
 		'dashboard_quick_press',
 		'dashboard_primary',
 		'dashboard_secondary',
-		'dashboard_site_health',
 		'welcome_panel',
 		'welcome', // "Welcome to WordPress" widget (older WP).
 	);
 
-	global $wp_meta_boxes;
-	$widgets = isset( $wp_meta_boxes['dashboard']['normal']['core'] )
-		? array_merge(
-			array_keys( $wp_meta_boxes['dashboard']['normal']['core'] ),
-			isset( $wp_meta_boxes['dashboard']['side']['core'] ) ? array_keys( $wp_meta_boxes['dashboard']['side']['core'] ) : array()
-		)
-		: array();
-
 	foreach ( $to_remove as $id ) {
 		remove_meta_box( $id, 'dashboard', 'normal' );
 		remove_meta_box( $id, 'dashboard', 'side' );
-	}
-
-	// Re-add Site Health — the one default widget that must stay.
-	if ( in_array( 'dashboard_site_health', $widgets, true ) ) {
-		wp_add_dashboard_widget(
-			'dashboard_site_health',
-			__( 'Site Health', 'szm-admin-suite' ),
-			'wp_dashboard_site_health'
-		);
 	}
 
 	wp_add_dashboard_widget(

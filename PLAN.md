@@ -24,7 +24,7 @@
 - **Themes**: drop-in thema-folders in `inc/themes/<naam>/` — elk met eigen CSS + klein descriptor-bestand (JSON) voor de picker. Nieuw thema = folder droppen, verschijnt vanzelf. Thema's individueel met AI te bouwen en te wisselen.
 - **Libraries** in `inc/libs/`: Plugin Update Checker + TGM Plugin Activation (hergebruikt uit bestaande plugin).
 - **Settings**: één top-level "Admin Suite"-menu met een Modules-tab (master aan/uit) plus een tab per module voor eigen instellingen (Jetpack-stijl).
-- **Per-role toepassing**: elke module is per-rol configureerbaar vanaf het begin.
+- **Per-role toepassing**: elke module is configureerbaar vanaf het begin via een "minimale rol" (de geselecteerde rol en alle rollen daarboven; "All roles" = iedereen incl. admins).
 - **Opties per site**, los opgeslagen, nooit overschreven bij update (zelfde patroon als `szm_amm_settings`).
 
 ## Delivery

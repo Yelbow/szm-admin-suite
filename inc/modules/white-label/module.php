@@ -59,6 +59,24 @@ function szm_as_white_label_boot( $settings ) {
 			return get_bloginfo( 'name' );
 		} );
 	}
+
+	// Media picker on the Admin Suite settings page. Depends on 'media-editor'
+	// so wp.media is fully loaded before the handler runs — an inline script
+	// in the form body executes too early (the media scripts load in the
+	// footer) and would find window.wp.media undefined.
+	add_action( 'admin_enqueue_scripts', function ( $hook ) {
+		if ( 'toplevel_page_szm-admin-suite' !== $hook ) {
+			return;
+		}
+		wp_enqueue_media();
+		wp_enqueue_script(
+			'szm-as-white-label',
+			SZM_AS_URL . 'inc/modules/white-label/picker.js',
+			array( 'media-editor' ),
+			SZM_AS_VERSION,
+			true
+		);
+	} );
 }
 
 function szm_as_white_label_sanitize( $input, $current ) {
@@ -112,22 +130,5 @@ function szm_as_white_label_render( $settings ) {
 			</td>
 		</tr>
 	</table>
-
-	<script>
-	(function () {
-		if ( ! window.wp || ! window.wp.media ) return;
-		document.querySelectorAll( '.szm-as-wl-pick' ).forEach( function ( btn ) {
-			btn.addEventListener( 'click', function () {
-				var target = document.getElementById( btn.getAttribute( 'data-target' ) );
-				var frame = wp.media( { title: 'Choose image', button: { text: 'Use this image' }, multiple: false } );
-				frame.on( 'select', function () {
-					var att = frame.state().get( 'selection' ).first().toJSON();
-					target.value = att.url;
-				} );
-				frame.open();
-			} );
-		} );
-	})();
-	</script>
 	<?php
 }

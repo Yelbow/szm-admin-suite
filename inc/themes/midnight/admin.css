@@ -13,7 +13,7 @@
 	--szm-midnight-accent-2:  #38bdf8;
 }
 
-body.admin-color-fresh {
+body.wp-admin, body.login {
 	background: var(--szm-midnight-bg);
 	color: var(--szm-midnight-text);
 }
@@ -42,6 +42,13 @@ body.admin-color-fresh {
 #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .wp-menu-open .wp-submenu a,
 #adminmenu li a:hover {
+	color: var(--szm-midnight-text);
+}
+#adminmenu div.wp-menu-image::before {
+	color: var(--szm-midnight-muted);
+}
+#adminmenu li.wp-has-current-submenu div.wp-menu-image::before,
+#adminmenu .wp-menu-open div.wp-menu-image::before {
 	color: var(--szm-midnight-text);
 }
 
@@ -103,8 +110,13 @@ body.admin-color-fresh {
 }
 
 /* Links */
-a {
+body.wp-admin .wrap a,
+body.login a {
 	color: var(--szm-midnight-accent-2);
+}
+body.wp-admin .wrap a:hover,
+body.login a:hover {
+	color: var(--szm-midnight-accent);
 }
 
 /* Settings page tab highlight */
@@ -152,4 +164,15 @@ table.widefat {
 }
 .widefat tr:nth-child(even) {
 	background: var(--szm-midnight-surface-2);
+}
+body.login h1 a {
+	color: var(--szm-midnight-accent-2);
+}
+body.login #nav a,
+body.login #backtoblog a {
+	color: var(--szm-midnight-accent-2);
+}
+body.login #nav a:hover,
+body.login #backtoblog a:hover {
+	color: var(--szm-midnight-accent);
 }

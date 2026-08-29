@@ -17,15 +17,25 @@ szm_as_register_module( array(
 	'icon'            => 'dashicons-visibility',
 	'default_enabled' => true,
 	'boot'            => 'szm_as_declutter_boot',
-	'settings'        => array( 'hidden_widgets' => array() ),
+	'settings'        => array(
+		'hidden_widgets' => array(
+			'dashboard_right_now',
+			'dashboard_activity',
+			'dashboard_quick_press',
+			'dashboard_primary',
+			'dashboard_secondary',
+			'welcome_panel',
+		),
+	),
 	'tab_title'       => __( 'Declutter', 'szm-admin-suite' ),
 	'render'          => 'szm_as_declutter_render',
 	'sanitize'        => 'szm_as_declutter_sanitize',
 ) );
 
 /**
- * The default dashboard widgets that can be hidden. Empty hidden_widgets in
- * settings means "hide them all" (the sensible default).
+ * The default dashboard widgets that can be hidden. An empty hidden_widgets
+ * list means "hide nothing" (show all defaults); the default is to hide
+ * every hideable widget.
  */
 function szm_as_declutter_get_hideable() {
 	return array(
@@ -48,12 +58,6 @@ function szm_as_declutter_boot() {
 function szm_as_declutter_setup() {
 	$settings = SZM_Admin_Suite::instance()->get_settings();
 	$hidden   = isset( $settings['declutter']['hidden_widgets'] ) ? (array) $settings['declutter']['hidden_widgets'] : array();
-	$hideable = szm_as_declutter_get_hideable();
-
-	// Empty = hide everything hideable (default).
-	if ( empty( $hidden ) ) {
-		$hidden = array_keys( $hideable );
-	}
 
 	foreach ( $hidden as $id ) {
 		remove_meta_box( $id, 'dashboard', 'normal' );
@@ -72,15 +76,16 @@ function szm_as_declutter_sanitize( $input, $current ) {
 }
 
 function szm_as_declutter_render( $settings ) {
-	$hideable = szm_as_declutter_get_hideable();
-	$hidden   = isset( $settings['hidden_widgets'] ) ? (array) $settings['hidden_widgets'] : array();
+	$hideable   = szm_as_declutter_get_hideable();
+	$hidden     = isset( $settings['hidden_widgets'] ) ? (array) $settings['hidden_widgets'] : array();
+	$all_hidden = ! array_diff( array_keys( $hideable ), $hidden );
 	?>
-	<p><?php esc_html_e( 'Choose which default dashboard widgets to hide. Leave nothing selected to hide all of the defaults below. Site Health is always kept.', 'szm-admin-suite' ); ?></p>
+	<p><?php esc_html_e( 'Tick the default dashboard widgets to hide. Unticking everything shows all of the defaults below. Site Health is always kept.', 'szm-admin-suite' ); ?></p>
 
 	<label style="display:block; margin-bottom:10px;">
 		<input type="checkbox" id="szm-as-declutter-defaults"
 			onchange="document.querySelectorAll('#szm-as-declutter-widgets input[type=checkbox]').forEach(function(cb){cb.checked=this.checked}.bind(this));"
-			<?php checked( empty( $hidden ) ); ?> />
+			<?php checked( $all_hidden ); ?> />
 		<strong><?php esc_html_e( 'Hide all defaults below', 'szm-admin-suite' ); ?></strong>
 	</label>
 
@@ -90,7 +95,7 @@ function szm_as_declutter_render( $settings ) {
 				<input type="checkbox"
 					name="<?php echo esc_attr( SZM_AS_OPTION ); ?>[declutter][hidden_widgets][]"
 					value="<?php echo esc_attr( $id ); ?>"
-					<?php checked( empty( $hidden ) || in_array( $id, $hidden, true ) ); ?> />
+					<?php checked( in_array( $id, $hidden, true ) ); ?> />
 				<?php echo esc_html( $label ); ?>
 			</label>
 		<?php endforeach; ?>

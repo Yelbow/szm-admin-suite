@@ -120,10 +120,10 @@ final class SZM_Admin_Suite {
 	 * ---------------------------------------------------------------- */
 
 	/**
-	 * Default settings. 'modules' holds the master on/off + per-role gate for
-	 * every module; each module's own section holds its module-specific
-	 * options. Merged from defaults on every read, so settings are never
-	 * overwritten by an update.
+	 * Default settings. 'modules' holds the master on/off + the minimum role
+	 * (role and up) for every module; each module's own section holds its
+	 * module-specific options. Merged from defaults on every read, so settings
+	 * are never overwritten by an update.
 	 */
 	public function default_settings() {
 		$modules = array();
@@ -131,8 +131,8 @@ final class SZM_Admin_Suite {
 
 		foreach ( $this->modules as $slug => $module ) {
 			$modules[ $slug ] = array(
-				'enabled' => (bool) $module['default_enabled'],
-				'roles'   => array(),
+				'enabled'  => (bool) $module['default_enabled'],
+				'min_role' => '',
 			);
 			$sections[ $slug ] = $module['settings'];
 		}
@@ -147,7 +147,10 @@ final class SZM_Admin_Suite {
 
 	private function deep_merge( array $defaults, array $overrides ) {
 		foreach ( $overrides as $key => $value ) {
-			if ( isset( $defaults[ $key ] ) && is_array( $defaults[ $key ] ) && is_array( $value ) ) {
+			// Only recurse into a non-empty array override. An empty array is
+			// a real value (e.g. declutter's hidden_widgets = "hide nothing")
+			// and must replace the default instead of silently keeping it.
+			if ( isset( $defaults[ $key ] ) && is_array( $defaults[ $key ] ) && is_array( $value ) && ! empty( $value ) ) {
 				$defaults[ $key ] = $this->deep_merge( $defaults[ $key ], $value );
 			} else {
 				$defaults[ $key ] = $value;
@@ -157,8 +160,9 @@ final class SZM_Admin_Suite {
 	}
 
 	/**
-	 * Whether a module is enabled AND applies to the current user's roles.
-	 * Empty roles = applies to everyone (including administrators).
+	 * Whether a module is enabled AND applies to the current user's role.
+	 * min_role '' = applies to everyone (including administrators); otherwise
+	 * the module applies to the selected role and every role above it.
 	 */
 	public function module_applies_to_user( $slug, $settings = null ) {
 		$settings = $settings ? $settings : $this->get_settings();
@@ -168,12 +172,72 @@ final class SZM_Admin_Suite {
 			return false;
 		}
 
-		$roles = isset( $mod['roles'] ) ? (array) $mod['roles'] : array();
-		if ( empty( $roles ) ) {
+		$min_role = isset( $mod['min_role'] ) ? (string) $mod['min_role'] : '';
+		if ( '' === $min_role ) {
 			return true;
 		}
 
-		return (bool) array_intersect( $roles, (array) wp_get_current_user()->roles );
+		$min_level = $this->role_level( $min_role );
+		if ( $min_level < 0 ) {
+			return true; // Unknown role in stored settings: fall back to applying.
+		}
+
+		$user = wp_get_current_user();
+		// Not logged in (e.g. the login page): no role gate is possible, so
+		// appearance modules (theme, white-label) still apply — the login
+		// page should match the admin look.
+		if ( empty( $user->roles ) ) {
+			return true;
+		}
+
+		foreach ( (array) $user->roles as $user_role ) {
+			if ( $this->role_level( $user_role ) >= $min_level ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Capability level of a role (highest level_N capability), used to order
+	 * roles for the "role and up" selector. Returns -1 for unknown roles.
+	 */
+	private function role_level( $role_slug ) {
+		$roles = wp_roles()->roles;
+		if ( ! isset( $roles[ $role_slug ] ) ) {
+			return -1;
+		}
+		$level = 0;
+		$caps  = isset( $roles[ $role_slug ]['capabilities'] ) ? (array) $roles[ $role_slug ]['capabilities'] : array();
+		foreach ( $caps as $cap => $allowed ) {
+			if ( $allowed && 0 === strpos( $cap, 'level_' ) ) {
+				$level = max( $level, (int) substr( $cap, 6 ) );
+			}
+		}
+		return $level;
+	}
+
+	/**
+	 * All roles ordered lowest → highest capability level.
+	 *
+	 * @return array[] List of ['slug' => string, 'name' => string, 'level' => int].
+	 */
+	private function role_level_ordered() {
+		$list = array();
+		foreach ( wp_roles()->roles as $slug => $role ) {
+			$list[] = array(
+				'slug'  => $slug,
+				'name'  => translate_user_role( $role['name'] ),
+				'level' => $this->role_level( $slug ),
+			);
+		}
+		usort( $list, function ( $a, $b ) {
+			if ( $a['level'] === $b['level'] ) {
+				return strcmp( $a['slug'], $b['slug'] );
+			}
+			return $a['level'] - $b['level'];
+		} );
+		return $list;
 	}
 
 	public function get_modules() {
@@ -210,11 +274,13 @@ final class SZM_Admin_Suite {
 		if ( isset( $input['modules'] ) && is_array( $input['modules'] ) ) {
 			foreach ( $this->modules as $slug => $module ) {
 				$row = isset( $input['modules'][ $slug ] ) ? $input['modules'][ $slug ] : array();
+				$min_role = isset( $row['min_role'] ) ? sanitize_key( $row['min_role'] ) : '';
+				if ( '' !== $min_role && ! isset( wp_roles()->roles[ $min_role ] ) ) {
+					$min_role = '';
+				}
 				$merged['modules'][ $slug ] = array(
-					'enabled' => ! empty( $row['enabled'] ),
-					'roles'   => isset( $row['roles'] ) && is_array( $row['roles'] )
-						? array_values( array_intersect( array_keys( wp_roles()->roles ), $row['roles'] ) )
-						: array(),
+					'enabled'  => ! empty( $row['enabled'] ),
+					'min_role' => $min_role,
 				);
 			}
 		}
@@ -279,12 +345,13 @@ final class SZM_Admin_Suite {
 	}
 
 	private function render_modules_tab( $settings ) {
-		$roles = wp_roles()->roles;
+		$roles_ordered = $this->role_level_ordered();
 		?>
-		<p><?php esc_html_e( 'Turn modules on or off and choose which roles each module applies to. Leave a module\'s roles empty to apply it to everyone, including administrators.', 'szm-admin-suite' ); ?></p>
+		<p><?php esc_html_e( 'Turn modules on or off and pick a minimum role per module. A module applies to the selected role and every role above it — "All roles" applies it to everyone, including administrators.', 'szm-admin-suite' ); ?></p>
 
 		<?php foreach ( $this->modules as $slug => $module ) :
 			$row = isset( $settings['modules'][ $slug ] ) ? $settings['modules'][ $slug ] : array();
+			$min_role = isset( $row['min_role'] ) ? $row['min_role'] : '';
 			?>
 			<div class="card" style="max-width:none; margin-bottom:16px;">
 				<div style="display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap;">
@@ -302,22 +369,22 @@ final class SZM_Admin_Suite {
 						<p class="description" style="margin-top:4px;"><?php echo esc_html( $module['description'] ); ?></p>
 
 						<div style="margin-top:10px;">
-							<strong><?php esc_html_e( 'Apply to roles:', 'szm-admin-suite' ); ?></strong>
-							<label style="display:inline-flex; align-items:center; margin-left:10px;">
-								<input type="checkbox"
-									name="<?php echo esc_attr( SZM_AS_OPTION ); ?>[modules][<?php echo esc_attr( $slug ); ?>][roles][]"
-									value="" <?php checked( empty( $row['roles'] ) ); ?> />
-								<?php esc_html_e( 'All roles', 'szm-admin-suite' ); ?>
+							<label style="display:inline-flex; align-items:center; gap:8px;">
+								<strong><?php esc_html_e( 'Minimum role:', 'szm-admin-suite' ); ?></strong>
+								<select name="<?php echo esc_attr( SZM_AS_OPTION ); ?>[modules][<?php echo esc_attr( $slug ); ?>][min_role]">
+									<option value="" <?php selected( $min_role, '' ); ?>>
+										<?php esc_html_e( 'All roles', 'szm-admin-suite' ); ?>
+									</option>
+									<?php foreach ( $roles_ordered as $role ) : ?>
+										<option value="<?php echo esc_attr( $role['slug'] ); ?>" <?php selected( $min_role, $role['slug'] ); ?>>
+											<?php echo esc_html( $role['name'] ); ?>
+										</option>
+									<?php endforeach; ?>
+								</select>
 							</label>
-							<?php foreach ( $roles as $role_slug => $role ) : ?>
-								<label style="display:inline-flex; align-items:center; margin-left:10px;">
-									<input type="checkbox"
-										name="<?php echo esc_attr( SZM_AS_OPTION ); ?>[modules][<?php echo esc_attr( $slug ); ?>][roles][]"
-										value="<?php echo esc_attr( $role_slug ); ?>"
-										<?php checked( in_array( $role_slug, (array) $row['roles'], true ) ); ?> />
-									<?php echo esc_html( translate_user_role( $role['name'] ) ); ?>
-								</label>
-							<?php endforeach; ?>
+							<p class="description" style="margin:4px 0 0;">
+								<?php esc_html_e( 'Applies to the selected role and every role above it.', 'szm-admin-suite' ); ?>
+							</p>
 						</div>
 					</div>
 				</div>
