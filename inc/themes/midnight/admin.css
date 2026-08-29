@@ -1,0 +1,155 @@
+/* SZM Admin Suite — "Midnight" theme.
+   Dark admin with a deep-space palette and cyan accents.
+   Scoped to the admin chrome; leave core layouts intact so it degrades safely. */
+
+:root {
+	--szm-midnight-bg:        #0b1020;
+	--szm-midnight-surface:   #131a2e;
+	--szm-midnight-surface-2: #1b2440;
+	--szm-midnight-border:    #2a3556;
+	--szm-midnight-text:      #e6ecff;
+	--szm-midnight-muted:     #93a0c4;
+	--szm-midnight-accent:    #22d3ee;
+	--szm-midnight-accent-2:  #38bdf8;
+}
+
+body.admin-color-fresh {
+	background: var(--szm-midnight-bg);
+	color: var(--szm-midnight-text);
+}
+
+/* Admin bar + sidebar */
+#wpadminbar {
+	background: var(--szm-midnight-surface);
+	border-bottom: 1px solid var(--szm-midnight-border);
+}
+
+#adminmenuback,
+#adminmenuwrap,
+#adminmenu {
+	background: var(--szm-midnight-surface);
+	border-right: 1px solid var(--szm-midnight-border);
+}
+
+#adminmenu .wp-submenu,
+#adminmenu .wp-has-current-submenu .wp-submenu {
+	background: var(--szm-midnight-surface-2);
+}
+
+#adminmenu a {
+	color: var(--szm-midnight-muted);
+}
+#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
+#adminmenu .wp-menu-open .wp-submenu a,
+#adminmenu li a:hover {
+	color: var(--szm-midnight-text);
+}
+
+/* Content area */
+#wpcontent,
+#wpbody-content {
+	background: var(--szm-midnight-bg);
+}
+
+.wrap,
+#wpbody-content .wrap {
+	color: var(--szm-midnight-text);
+}
+
+/* Panels / cards / widgets */
+.postbox,
+#dashboard-widgets .postbox,
+#dashboard-widgets .meta-box-sortables .postbox,
+.card,
+.acf-postbox {
+	background: var(--szm-midnight-surface);
+	border: 1px solid var(--szm-midnight-border);
+	color: var(--szm-midnight-text);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.postbox h2.hndle,
+.postbox .postbox-header h2,
+#dashboard-widgets .postbox h2,
+#dashboard-widgets .postbox .postbox-header h2 {
+	border-bottom: 1px solid var(--szm-midnight-border);
+	color: var(--szm-midnight-text);
+}
+
+/* Inside text */
+.postbox .inside,
+#dashboard-widgets .postbox .inside,
+#dashboard-widgets .inside {
+	color: var(--szm-midnight-muted);
+}
+
+/* Buttons */
+.wp-core-ui .button,
+.wp-core-ui .button-secondary {
+	color: var(--szm-midnight-text);
+	border-color: var(--szm-midnight-border);
+	background: var(--szm-midnight-surface-2);
+}
+.wp-core-ui .button-primary {
+	background: var(--szm-midnight-accent);
+	border-color: var(--szm-midnight-accent);
+	color: #06222a;
+}
+.wp-core-ui .button-primary:hover,
+.wp-core-ui .button-primary:focus {
+	background: var(--szm-midnight-accent-2);
+	border-color: var(--szm-midnight-accent-2);
+	color: #06222a;
+}
+
+/* Links */
+a {
+	color: var(--szm-midnight-accent-2);
+}
+
+/* Settings page tab highlight */
+.nav-tab-wrapper .nav-tab-active,
+.nav-tab-wrapper .nav-tab-active:hover {
+	background: var(--szm-midnight-surface-2);
+	border-bottom-color: transparent;
+	color: var(--szm-midnight-text);
+}
+
+/* Notices keep readable on dark */
+.notice,
+div.updated,
+div.error {
+	background: var(--szm-midnight-surface-2);
+	color: var(--szm-midnight-text);
+	border-color: var(--szm-midnight-border);
+}
+
+/* Login page */
+body.login {
+	background: var(--szm-midnight-bg);
+}
+body.login #loginform,
+body.login #registerform,
+body.login #lostpasswordform {
+	background: var(--szm-midnight-surface);
+	border: 1px solid var(--szm-midnight-border);
+	color: var(--szm-midnight-text);
+}
+
+/* Tables */
+.widefat,
+table.widefat {
+	background: var(--szm-midnight-surface);
+	color: var(--szm-midnight-text);
+	border-color: var(--szm-midnight-border);
+}
+.widefat th,
+.widefat td {
+	border-bottom: 1px solid var(--szm-midnight-border);
+}
+.widefat tr:nth-child(odd) {
+	background: var(--szm-midnight-surface);
+}
+.widefat tr:nth-child(even) {
+	background: var(--szm-midnight-surface-2);
+}

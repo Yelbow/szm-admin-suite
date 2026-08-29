@@ -36,10 +36,9 @@
 
 ## Installatie-plugins (Plugin Recommendations)
 
-- Vaste, gecureerde starterlijst (SEO, security, backups, performance, forms, etc.).
+- Vaste, gecureerde starterlijst — v1: **Yoast SEO**, **Yoast Duplicator**, **Sucuri Security**. Uitbreidbaar later.
 - Slaat reeds geïnstalleerde over; biedt one-click install/activate.
 - Install/activate via admin-ajax met nonce + `manage_options`-gating (best practice voor het client-demo-geval).
-- Deze vaste lijst zelf is nog open — op te stellen in eerste bouwstap (na te vragen welke plugins Jelle standaard aanraadt).
 
 ## TODO-stappen (overzicht, detail in TODO.md)
 

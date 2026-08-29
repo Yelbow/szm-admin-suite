@@ -14,4 +14,5 @@
 - Admin theme module: "this is mostly i place i can put themes in. so i tell ai to build a cyberpunk theme and he puts a theme there. then we start working on a pink kawaii theme. seperatly. then i can switch between them and also continue working on them with ai individuelly." → drop-in theme folders.
 - Dashboard: "no basic shit actual usefull stuff. visitors stats etc, Plugin recommendations card, Welcome card." Maar visitors stats: "No stats in v1."
 - "only the default site health can stay" — op het custom dashboard mag alleen de Site Health widget van de defaults blijven.
+- Plugin Recommendations vaste starterlijst: "voor nu yoast seo, yoast duplicator, en sucuri security. meer voegen we later wel toe."
 - Theme vs white-label grens: "Yes, that split" → theme module = kleur/typografie/layout/presets; white-label = logo, footer tekst, login achtergrond.
