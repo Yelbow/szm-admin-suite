@@ -1,191 +1,335 @@
 /* SZM Admin Suite — "Goth Baddie" theme.
-   Dark plum-black surfaces with crimson/baddie-pink + mauve accents.
-   Every text/icon pairing is WCAG AA checked (4.5:1 text, 3:1 icons).
-   Scoped to the admin chrome; leave core layouts intact so it degrades safely. */
+   Elegant dark plum-black with oxblood-crimson + dusty mauve. Matte, not neon
+   (that's cyberpunk's lane): floating rounded cards, a pill sidebar, refined
+   type. Every text/icon pairing is WCAG AA checked.
+   Scoped to the admin chrome; core layouts stay intact so it degrades safely. */
 
 :root {
-	--szm-goth-bg:        #0e0a11;
-	--szm-goth-surface:   #17121c;
-	--szm-goth-surface-2: #211a27;
-	--szm-goth-border:    #372c40;
-	--szm-goth-text:      #ede6f2;
-	--szm-goth-muted:     #a899b8;
-	--szm-goth-accent:    #e73d6a;
-	--szm-goth-accent-2:  #b18cd9;
-	--szm-goth-on-accent: #1a0510;
-	--szm-goth-glow:      rgba(231, 61, 106, 0.28);
-	--szm-goth-glow-2:    rgba(177, 140, 217, 0.25);
+	--szm-goth-bg:        #120b17;   /* deep plum-black page */
+	--szm-goth-bg-2:      #0d080f;
+	--szm-goth-surface:   #1e1525;   /* lifted card, floats off the page */
+	--szm-goth-surface-2: #271b30;
+	--szm-goth-sidebar:   #170f1d;
+	--szm-goth-border:    #362840;
+	--szm-goth-border-2:  #46344f;
+	--szm-goth-text:      #efe6f3;
+	--szm-goth-heading:   #ffffff;
+	--szm-goth-muted:     #a394b1;
+	--szm-goth-accent:    #ff3d6e;   /* crimson/baddie-pink */
+	--szm-goth-accent-dk: #e01b54;
+	--szm-goth-accent-2:  #c9a4e8;   /* dusty mauve, readable link on dark */
+	--szm-goth-mauve-dk:  #7a4fa0;
+	--szm-goth-on-accent: #ffffff;
+	--szm-goth-shadow:    rgba(0, 0, 0, 0.5);
+	--szm-goth-glow:      rgba(255, 61, 110, 0.22);
+	--szm-goth-radius:    16px;
 }
 
-body.wp-admin, body.login {
+/* ---- Base / typography ------------------------------------------------ */
+body.wp-admin,
+body.login {
 	background: var(--szm-goth-bg);
 	color: var(--szm-goth-text);
+	font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Inter", Roboto, sans-serif;
+}
+body.wp-admin #wpwrap {
+	background: var(--szm-goth-bg);
+}
+.wrap h1,
+.wrap h1.wp-heading-inline,
+#wpbody-content .wrap > h1 {
+	color: var(--szm-goth-heading);
+	font-weight: 700;
+	letter-spacing: -0.01em;
 }
 
-/* Admin bar + sidebar */
+/* ---- Admin bar -------------------------------------------------------- */
 #wpadminbar {
-	background: var(--szm-goth-surface);
-	border-bottom: 1px solid var(--szm-goth-accent);
-	box-shadow: 0 0 12px var(--szm-goth-glow);
+	background: var(--szm-goth-sidebar);
+	border-bottom: 1px solid var(--szm-goth-border);
+	box-shadow: 0 1px 0 rgba(255, 61, 110, 0.14);
 }
-
-#adminmenuback,
-#adminmenuwrap,
-#adminmenu {
-	background: linear-gradient(180deg, var(--szm-goth-surface) 0%, var(--szm-goth-surface-2) 100%);
-	border-right: 1px solid var(--szm-goth-border);
-}
-
-#adminmenu .wp-submenu,
-#adminmenu .wp-has-current-submenu .wp-submenu {
-	background: var(--szm-goth-surface-2);
-}
-
-#adminmenu a {
-	color: var(--szm-goth-muted);
-}
-#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
-#adminmenu .wp-menu-open .wp-submenu a,
-#adminmenu li a:hover {
+#wpadminbar .ab-item,
+#wpadminbar a.ab-item,
+#wpadminbar > #wp-toolbar span.ab-label,
+#wpadminbar .ab-icon,
+#wpadminbar .ab-item:before,
+#wpadminbar span.ab-icon::before,
+#wpadminbar a.ab-item .ab-icon::before {
 	color: var(--szm-goth-text);
 }
-#adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
-#adminmenu .wp-menu-open > a.wp-menu-open {
-	border-left-color: var(--szm-goth-accent);
-	box-shadow: inset 3px 0 0 var(--szm-goth-accent);
+#wpadminbar .ab-top-menu > li:hover > .ab-item,
+#wpadminbar .ab-top-menu > li.hover > .ab-item {
+	background: var(--szm-goth-surface-2);
+	color: var(--szm-goth-accent);
+}
+
+/* ---- Sidebar (floating pill menu) ------------------------------------ */
+#adminmenuback,
+#adminmenuwrap {
+	background: var(--szm-goth-bg);
+}
+#adminmenu,
+#adminmenu .wp-submenu,
+#adminmenu .wp-has-current-submenu .wp-submenu,
+#adminmenu .wp-has-current-submenu.wp-menu-open .wp-submenu,
+.folded #adminmenu .wp-submenu {
+	background: var(--szm-goth-sidebar);
+}
+#adminmenuwrap {
+	border-right: 1px solid var(--szm-goth-border);
+}
+#adminmenu {
+	padding: 10px 0;
+	border: 0;
+}
+#adminmenu li.menu-top,
+#adminmenu li.wp-menu-separator {
+	margin: 2px 10px;
+	border-radius: 12px;
+}
+#adminmenu a.menu-top,
+#adminmenu .wp-submenu a {
+	color: var(--szm-goth-muted);
+}
+#adminmenu li.menu-top > a.menu-top {
+	border-radius: 12px;
+}
+#adminmenu li a:hover,
+#adminmenu li.menu-top:hover,
+#adminmenu li.menu-top > a.menu-top:focus {
+	background: var(--szm-goth-surface-2);
+	color: var(--szm-goth-heading);
+}
+#adminmenu li.menu-top:hover div.wp-menu-image::before,
+#adminmenu li.menu-top > a.menu-top:focus div.wp-menu-image::before {
+	color: var(--szm-goth-accent);
+}
+/* active item = oxblood pill */
+#adminmenu li.current > a.menu-top,
+#adminmenu li.wp-has-current-submenu > a.wp-has-current-submenu,
+#adminmenu li.current a.menu-top:focus,
+#adminmenu > li.current > a.current {
+	background: linear-gradient(90deg, #e01b54 0%, #cf204f 100%);
+	color: var(--szm-goth-on-accent);
+	border-radius: 12px;
+	box-shadow: 0 4px 14px var(--szm-goth-glow);
+}
+#adminmenu li.current > a.menu-top div.wp-menu-image::before,
+#adminmenu li.wp-has-current-submenu > a.wp-has-current-submenu div.wp-menu-image::before {
+	color: var(--szm-goth-on-accent) !important;
 }
 #adminmenu div.wp-menu-image::before {
 	color: var(--szm-goth-accent-2);
 }
-#adminmenu li.wp-has-current-submenu div.wp-menu-image::before,
-#adminmenu .wp-menu-open div.wp-menu-image::before {
+#adminmenu .wp-menu-arrow,
+#adminmenu li.wp-has-current-submenu .wp-menu-arrow,
+#adminmenu .wp-menu-arrow div {
+	display: none;
+}
+/* inline (open, current) submenu = soft inset panel */
+#adminmenu li.wp-has-current-submenu.wp-menu-open > .wp-submenu {
+	background: var(--szm-goth-surface);
+	border-radius: 12px;
+	margin: 4px 0 4px 4px;
+	padding: 6px;
+	box-shadow: none;
+}
+#adminmenu li.menu-top .wp-submenu {
+	border-radius: 12px;
+	margin-left: 2px;
+	padding: 6px;
+	box-shadow: 0 10px 26px var(--szm-goth-shadow);
+}
+#adminmenu .wp-submenu a {
+	border-radius: 8px;
+	padding-top: 7px;
+	padding-bottom: 7px;
+	color: var(--szm-goth-muted);
+}
+#adminmenu .wp-submenu li.current a,
+#adminmenu .wp-submenu a:hover {
 	color: var(--szm-goth-accent);
+	background: var(--szm-goth-surface-2);
+}
+#adminmenu .awaiting-mod,
+#adminmenu .update-plugins {
+	background: var(--szm-goth-accent);
+	color: var(--szm-goth-on-accent);
+	border-radius: 999px;
+}
+#collapse-button {
+	color: var(--szm-goth-muted);
 }
 
-/* Content area */
+/* ---- Content area ----------------------------------------------------- */
 #wpcontent,
 #wpbody-content {
 	background: var(--szm-goth-bg);
 }
-
+#wpbody-content {
+	padding-bottom: 40px;
+}
 .wrap,
 #wpbody-content .wrap {
 	color: var(--szm-goth-text);
 }
 
-/* Panels / cards / widgets */
+/* ---- Cards / widgets -------------------------------------------------- */
 .postbox,
 #dashboard-widgets .postbox,
 #dashboard-widgets .meta-box-sortables .postbox,
 .card,
-.acf-postbox {
+.acf-postbox,
+.welcome-panel {
 	background: var(--szm-goth-surface);
 	border: 1px solid var(--szm-goth-border);
 	color: var(--szm-goth-text);
-	box-shadow: 0 2px 14px var(--szm-goth-glow);
-	border-radius: 8px;
+	box-shadow: 0 8px 24px var(--szm-goth-shadow);
+	border-radius: var(--szm-goth-radius);
 }
-
 .postbox h2.hndle,
 .postbox .postbox-header h2,
 #dashboard-widgets .postbox h2,
 #dashboard-widgets .postbox .postbox-header h2 {
 	border-bottom: 1px solid var(--szm-goth-border);
-	color: var(--szm-goth-text);
+	color: var(--szm-goth-heading);
+	font-weight: 700;
+	padding: 16px 18px;
+	border-radius: var(--szm-goth-radius) var(--szm-goth-radius) 0 0;
 }
-
 .postbox .inside,
 #dashboard-widgets .postbox .inside,
 #dashboard-widgets .inside {
 	color: var(--szm-goth-muted);
+	padding: 4px 18px 16px;
+}
+.postbox .postbox-header .handle-actions button,
+.postbox .handle-order-higher,
+.postbox .handle-order-lower {
+	color: var(--szm-goth-muted);
 }
 
-/* Buttons */
+/* ---- Buttons ---------------------------------------------------------- */
 .wp-core-ui .button,
 .wp-core-ui .button-secondary {
 	color: var(--szm-goth-text);
-	border-color: var(--szm-goth-border);
+	border: 1px solid var(--szm-goth-border-2);
 	background: var(--szm-goth-surface-2);
+	border-radius: 999px;
+	padding: 2px 16px;
+	min-height: 34px;
+	line-height: 32px;
+	transition: box-shadow .15s ease, transform .15s ease;
 }
 .wp-core-ui .button:hover,
 .wp-core-ui .button-secondary:hover {
 	border-color: var(--szm-goth-accent-2);
-	box-shadow: 0 0 10px var(--szm-goth-glow-2);
+	color: var(--szm-goth-heading);
+	box-shadow: 0 4px 12px var(--szm-goth-shadow);
+	transform: translateY(-1px);
 }
 .wp-core-ui .button-primary {
-	background: var(--szm-goth-accent);
-	border-color: var(--szm-goth-accent);
+	background: linear-gradient(90deg, #e01b54 0%, #cf204f 100%);
+	border: 0;
 	color: var(--szm-goth-on-accent);
-	box-shadow: 0 0 12px var(--szm-goth-glow);
+	border-radius: 999px;
+	padding: 2px 20px;
+	min-height: 34px;
+	line-height: 34px;
+	font-weight: 700;
+	box-shadow: 0 4px 14px var(--szm-goth-glow);
+	text-shadow: none;
 }
 .wp-core-ui .button-primary:hover,
 .wp-core-ui .button-primary:focus {
-	background: var(--szm-goth-accent-2);
-	border-color: var(--szm-goth-accent-2);
+	background: linear-gradient(90deg, #d61550 0%, #b91247 100%);
 	color: var(--szm-goth-on-accent);
-	box-shadow: 0 0 16px var(--szm-goth-glow-2);
+	box-shadow: 0 6px 20px var(--szm-goth-glow);
+	transform: translateY(-1px);
 }
 
-/* Links */
+/* ---- Links ------------------------------------------------------------ */
 body.wp-admin .wrap a,
+body.wp-admin .postbox a,
 body.login a {
 	color: var(--szm-goth-accent-2);
 }
 body.wp-admin .wrap a:hover,
+body.wp-admin .postbox a:hover,
 body.login a:hover {
 	color: var(--szm-goth-accent);
 }
 
-/* Settings page tab highlight */
+/* ---- Settings tabs ---------------------------------------------------- */
+.nav-tab-wrapper {
+	border-bottom: 1px solid var(--szm-goth-border);
+}
+.nav-tab-wrapper .nav-tab {
+	background: var(--szm-goth-surface-2);
+	border: 1px solid var(--szm-goth-border);
+	color: var(--szm-goth-muted);
+	border-radius: 999px;
+	margin-right: 6px;
+}
 .nav-tab-wrapper .nav-tab-active,
-.nav-tab-wrapper .nav-tab-active:hover {
-	background: var(--szm-goth-accent);
-	border-color: var(--szm-goth-accent);
+.nav-tab-wrapper .nav-tab-active:hover,
+.nav-tab-wrapper .nav-tab-active:focus {
+	background: linear-gradient(90deg, #e01b54 0%, #cf204f 100%);
+	border-color: transparent;
 	color: var(--szm-goth-on-accent);
+	border-radius: 999px;
 }
 
-/* Notices keep readable on dark */
+/* ---- Notices ---------------------------------------------------------- */
 .notice,
 div.updated,
 div.error {
 	background: var(--szm-goth-surface-2);
 	color: var(--szm-goth-text);
 	border-color: var(--szm-goth-border);
+	border-radius: 12px;
+	box-shadow: 0 4px 12px var(--szm-goth-shadow);
 }
 
-/* Forms */
+/* ---- Forms ------------------------------------------------------------ */
 .wp-core-ui select,
 .wp-core-ui input[type="text"],
 .wp-core-ui input[type="url"],
 .wp-core-ui input[type="email"],
 .wp-core-ui input[type="password"],
+.wp-core-ui input[type="search"],
+.wp-core-ui input[type="number"],
 .wp-core-ui textarea {
 	background: var(--szm-goth-surface-2);
-	border-color: var(--szm-goth-border);
+	border: 1px solid var(--szm-goth-border-2);
 	color: var(--szm-goth-text);
+	border-radius: 10px;
 }
 .wp-core-ui select:focus,
 .wp-core-ui input:focus,
 .wp-core-ui textarea:focus {
 	border-color: var(--szm-goth-accent);
-	box-shadow: 0 0 8px var(--szm-goth-glow);
+	box-shadow: 0 0 0 3px var(--szm-goth-glow);
+	outline: none;
 }
 
-/* Login page */
+/* ---- Login page ------------------------------------------------------- */
 body.login {
-	background: var(--szm-goth-bg);
+	background: radial-gradient(120% 120% at 50% 0%, #241226 0%, var(--szm-goth-bg) 55%);
 }
 body.login #loginform,
 body.login #registerform,
 body.login #lostpasswordform {
 	background: var(--szm-goth-surface);
-	border: 1px solid var(--szm-goth-accent);
-	box-shadow: 0 0 20px var(--szm-goth-glow);
+	border: 1px solid var(--szm-goth-border);
+	box-shadow: 0 16px 40px var(--szm-goth-shadow);
+	border-radius: 20px;
 	color: var(--szm-goth-text);
 }
 body.login h1 a {
 	color: var(--szm-goth-accent);
-	text-shadow: 0 0 12px var(--szm-goth-glow);
+	text-shadow: 0 0 18px var(--szm-goth-glow);
 }
 body.login #nav a,
 body.login #backtoblog a {
@@ -196,12 +340,18 @@ body.login #backtoblog a:hover {
 	color: var(--szm-goth-accent);
 }
 
-/* Tables */
+/* ---- Tables ----------------------------------------------------------- */
 .widefat,
 table.widefat {
 	background: var(--szm-goth-surface);
 	color: var(--szm-goth-text);
-	border-color: var(--szm-goth-border);
+	border: 1px solid var(--szm-goth-border);
+	border-radius: 12px;
+	overflow: hidden;
+}
+.widefat th,
+.widefat thead td {
+	color: var(--szm-goth-heading);
 }
 .widefat th,
 .widefat td {

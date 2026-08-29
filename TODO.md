@@ -30,6 +30,12 @@
 - [x] `goth-baddie` thema gebouwd (donker pruimen-zwart, karmijn + mauve).
 - [x] Alle 4 thema's halen alle 13 live contrast-checks (menu, adminbar, buttons, links, postbox, login).
 
+## Redesign-sessie 2026-08-29 (moderne look + visuele verificatie)
+- [x] Alle 4 thema's herontworpen naar moderne floating-card look (zwevende pill-sidebar, afgeronde kaarten 16px, gradient pill-buttons, pill settings-tabs, radial-gradient login) — één gedeeld skelet per palet.
+- [x] `kawaii` opgewarmd naar crème-roze (#fbeef3, niet stralend wit) op verzoek "this is too white"; `goth-baddie` matte pruim/oxbloed, duidelijk anders dan cyberpunk; `midnight` strak leisteen-indigo; `cyberpunk` neon behouden.
+- [x] Echte visuele verificatie via Playwright-screenshots tegen mhh Docker-site (niet alleen computed styles) — alle 4 bevestigd.
+- [x] Button/pill-tekst-contrast aangescherpt naar ≥4.5:1 (donkerder gradient-eindstops op alleen de wit-op-gradient regels).
+
 ## Getest (op echte WP-testsite, mhh docker)
 - [x] Modules registreren + defaults correct (aan/uit zoals gepland).
 - [x] Dashboard: Welcome + Recommendations renderen, Site Health blijft, defaults weg (echte HTTP check).
@@ -43,4 +49,7 @@
 - [ ] Menu-restrictie-module overnemen uit `szm-admin-menu-manager` (pas na v1 bewezen).
 - [ ] Bezoekers-statistieken (bewust uitgesteld, "No stats in v1").
 - [ ] Zelfde PUC/TGM-patronen + echte publieke repo `Yelbow/szm-admin-suite` aanmaken (repo bestaat nog niet).
-- [ ] Admin-password op mhh-testsite is tijdelijk gewijzigd voor verificatie (origineel onbekend, terugzetten na overleg).
+- [ ] Tijdelijke wijzigingen op de mhh-testsite (voor screenshot-verificatie) terugzetten na overleg:
+  - admin-password tijdelijk gewijzigd (origineel onbekend; nieuwe waarde staat in lokale sessienotitie, niet in de repo).
+  - `DISABLE_WP_CRON true` toegevoegd aan wp-config (was traag door overdue cron → externe API's).
+  - `home`/`siteurl` gezet naar `http://localhost:8096` (waren de tailscale HTTPS-URL; veroorzaakte redirect-vertraging).
