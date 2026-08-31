@@ -54,8 +54,14 @@
 - [x] Per-gebruiker "seen"-tracking zodat een handmatige keuze van de gebruiker nooit wordt overschreven.
 - [x] Settings-tab toont bekende widgets (opgebouwd via een site-wide "known widgets"-optie) met checkboxes voor de allowlist.
 - [x] Geverifieerd op mhh-testsite via directe aanroep van de actieve plugin-functie (`wp eval --user=1`) met een gesimuleerde Sucuri-widget: nieuwe widget → verborgen; Welcome/Recommendations/Site Health → zichtbaar; gebruiker-aanvinken blijft bewaard.
-- [ ] Nog geen echte browser/Screen-Options-UI-klik-verificatie (alleen functie-niveau).
 - [x] Versie gebumpt naar 1.0.2, tag `1.0.2` + GitHub release gepubliceerd.
+
+## Declutter bugfix 2026-08-31 (na "op mijn live site verborgen ze niet")
+- [x] Bug bevestigd lokaal (mhh-testsite, echte Playwright browser-login + dashboardload): Yoast-widgets bleven zichtbaar ondanks 1.0.2.
+- [x] Root cause gevonden via `error_log`-trace: `wp_dashboard_setup()` wordt in `wp-admin/index.php` **direct** aangeroepen, niet via de `load-index.php`-hook — onze `load-index.php` prio-20 callback draaide dus vóórdat er ook maar één widget geregistreerd was (`$wp_meta_boxes['dashboard']` was leeg op dat moment).
+- [x] Fix: hook nu op de `wp_dashboard_setup` **action** zelf (die Yoast en andere plugins gebruiken om hun eigen widget te registreren) op prioriteit `PHP_INT_MAX`, zodat we altijd na iedereen draaien.
+- [x] Geverifieerd met een echte browser-login + ruwe HTML-inspectie (niet alleen function-level `wp eval`): Yoast-widgets krijgen `hide-if-js` op de postbox-div en hun Screen-Options-checkbox staat uit; Welcome/Recommendations/Site Health blijven aan.
+- [x] Versie gebumpt naar 1.0.3, tag + release.
 
 ## Nog te doen / niet gepland
 - [ ] Menu-restrictie-module overnemen uit `szm-admin-menu-manager` (pas na v1 bewezen).

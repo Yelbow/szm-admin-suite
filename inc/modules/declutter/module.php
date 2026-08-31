@@ -45,9 +45,13 @@ function szm_as_declutter_boot() {
 	if ( ! is_admin() ) {
 		return;
 	}
-	// Runs after wp_dashboard_setup() (hooked to load-index.php at the
-	// default priority) has registered every widget, core and plugin.
-	add_action( 'load-index.php', 'szm_as_declutter_sync', 20 );
+	// wp-admin/index.php calls wp_dashboard_setup() directly — it is NOT
+	// hooked onto 'load-index.php', so a callback there runs before any
+	// widget exists. Widgets themselves (core and plugin, e.g. Yoast) are
+	// added by hooking the 'wp_dashboard_setup' action fired from inside
+	// that function. Hook the same action at the latest possible priority
+	// so we run after every one of them, regardless of the priority they used.
+	add_action( 'wp_dashboard_setup', 'szm_as_declutter_sync', PHP_INT_MAX );
 }
 
 /**
