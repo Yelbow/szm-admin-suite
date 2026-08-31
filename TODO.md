@@ -54,7 +54,8 @@
 - [x] Per-gebruiker "seen"-tracking zodat een handmatige keuze van de gebruiker nooit wordt overschreven.
 - [x] Settings-tab toont bekende widgets (opgebouwd via een site-wide "known widgets"-optie) met checkboxes voor de allowlist.
 - [x] Geverifieerd op mhh-testsite via directe aanroep van de actieve plugin-functie (`wp eval --user=1`) met een gesimuleerde Sucuri-widget: nieuwe widget → verborgen; Welcome/Recommendations/Site Health → zichtbaar; gebruiker-aanvinken blijft bewaard.
-- [ ] Nog geen echte browser/Screen-Options-UI-klik-verificatie (alleen functie-niveau); geen versie-bump/tag/release gedaan voor deze wijziging.
+- [ ] Nog geen echte browser/Screen-Options-UI-klik-verificatie (alleen functie-niveau).
+- [x] Versie gebumpt naar 1.0.2, tag `1.0.2` + GitHub release gepubliceerd.
 
 ## Nog te doen / niet gepland
 - [ ] Menu-restrictie-module overnemen uit `szm-admin-menu-manager` (pas na v1 bewezen).
