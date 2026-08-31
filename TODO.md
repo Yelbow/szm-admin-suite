@@ -45,10 +45,20 @@
 - [x] Settings-save via options.php: modules-tab saved (incl. min_role), andere tabs worden niet gewist.
 - [x] Minimale-rol gating live: editor wel / subscriber niet bij `editor`; admin altijd; lege rol = iedereen; login-pagina altijd.
 
+## Release (2026-08-29/31)
+- [x] Publieke repo `Yelbow/szm-admin-suite` aangemaakt, `origin` gezet, main gepusht.
+- [x] Tags `1.0.0` en `1.0.1` gezet; GitHub release `1.0.1` gepubliceerd (PUC self-update nu werkend, zie DECISIONS.md).
+
+## Declutter herontwerp (2026-08-31, na gebruikersfeedback "nieuwe plugins geven rommel")
+- [x] Declutter omgebouwd naar allowlist-model: elke dashboard-widget die niet op `always_show` staat (default Welcome + Plugin Recommendations; Site Health hardcoded uitgezonderd) start uitgevinkt in Screen Options, inclusief widgets van later geïnstalleerde plugins.
+- [x] Per-gebruiker "seen"-tracking zodat een handmatige keuze van de gebruiker nooit wordt overschreven.
+- [x] Settings-tab toont bekende widgets (opgebouwd via een site-wide "known widgets"-optie) met checkboxes voor de allowlist.
+- [x] Geverifieerd op mhh-testsite via directe aanroep van de actieve plugin-functie (`wp eval --user=1`) met een gesimuleerde Sucuri-widget: nieuwe widget → verborgen; Welcome/Recommendations/Site Health → zichtbaar; gebruiker-aanvinken blijft bewaard.
+- [ ] Nog geen echte browser/Screen-Options-UI-klik-verificatie (alleen functie-niveau); geen versie-bump/tag/release gedaan voor deze wijziging.
+
 ## Nog te doen / niet gepland
 - [ ] Menu-restrictie-module overnemen uit `szm-admin-menu-manager` (pas na v1 bewezen).
 - [ ] Bezoekers-statistieken (bewust uitgesteld, "No stats in v1").
-- [ ] Zelfde PUC/TGM-patronen + echte publieke repo `Yelbow/szm-admin-suite` aanmaken (repo bestaat nog niet).
 - [ ] Tijdelijke wijzigingen op de mhh-testsite (voor screenshot-verificatie) terugzetten na overleg:
   - admin-password tijdelijk gewijzigd (origineel onbekend; nieuwe waarde staat in lokale sessienotitie, niet in de repo).
   - `DISABLE_WP_CRON true` toegevoegd aan wp-config (was traag door overdue cron → externe API's).

@@ -2,8 +2,14 @@
 /**
  * Module: Declutter.
  *
- * Turns off the "dumb" default dashboard widgets. Site Health is always kept
- * (per SPEC). On by default. Hidden widgets are configurable.
+ * Keeps the dashboard from filling up with widgets. Any dashboard widget
+ * that isn't explicitly allow-listed (Welcome, Plugin Recommendations, Site
+ * Health) starts unchecked in Screen Options — including ones a freshly
+ * installed plugin adds on its own (Yoast, Duplicator, Sucuri, etc. all like
+ * to drop their own dashboard box). This is a soft default, not a removal:
+ * the widget is still there and each user can tick it back on for
+ * themselves via Screen Options. Once a user has made a choice about a
+ * given widget, we never touch that choice again.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -13,18 +19,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 szm_as_register_module( array(
 	'slug'            => 'declutter',
 	'name'            => __( 'Declutter', 'szm-admin-suite' ),
-	'description'     => __( 'Hides the default dashboard widgets (Welcome panel, At a Glance, Activity, Quick Draft, WordPress news). Site Health always stays.', 'szm-admin-suite' ),
+	'description'     => __( 'Keeps new dashboard widgets (including ones added by newly installed plugins) unchecked in Screen Options by default. Site Health, Welcome and Plugin Recommendations always stay visible.', 'szm-admin-suite' ),
 	'icon'            => 'dashicons-visibility',
 	'default_enabled' => true,
 	'boot'            => 'szm_as_declutter_boot',
 	'settings'        => array(
-		'hidden_widgets' => array(
-			'dashboard_right_now',
-			'dashboard_activity',
-			'dashboard_quick_press',
-			'dashboard_primary',
-			'dashboard_secondary',
-			'welcome_panel',
+		'always_show' => array(
+			'szm_as_dashboard_welcome',
+			'szm_as_dashboard_recommendations',
 		),
 	),
 	'tab_title'       => __( 'Declutter', 'szm-admin-suite' ),
@@ -33,72 +35,115 @@ szm_as_register_module( array(
 ) );
 
 /**
- * The default dashboard widgets that can be hidden. An empty hidden_widgets
- * list means "hide nothing" (show all defaults); the default is to hide
- * every hideable widget.
+ * Widget ids that are never subject to hiding, regardless of settings.
  */
-function szm_as_declutter_get_hideable() {
-	return array(
-		'dashboard_right_now'   => __( 'At a Glance', 'szm-admin-suite' ),
-		'dashboard_activity'    => __( 'Activity', 'szm-admin-suite' ),
-		'dashboard_quick_press' => __( 'Quick Draft', 'szm-admin-suite' ),
-		'dashboard_primary'     => __( 'WordPress Events and News', 'szm-admin-suite' ),
-		'dashboard_secondary'   => __( 'Secondary News', 'szm-admin-suite' ),
-		'welcome_panel'         => __( 'Welcome panel', 'szm-admin-suite' ),
-	);
+function szm_as_declutter_protected() {
+	return array( 'dashboard_site_health' );
 }
 
 function szm_as_declutter_boot() {
 	if ( ! is_admin() ) {
 		return;
 	}
-	add_action( 'wp_dashboard_setup', 'szm_as_declutter_setup', 20 );
+	// Runs after wp_dashboard_setup() (hooked to load-index.php at the
+	// default priority) has registered every widget, core and plugin.
+	add_action( 'load-index.php', 'szm_as_declutter_sync', 20 );
 }
 
-function szm_as_declutter_setup() {
-	$settings = SZM_Admin_Suite::instance()->get_settings();
-	$hidden   = isset( $settings['declutter']['hidden_widgets'] ) ? (array) $settings['declutter']['hidden_widgets'] : array();
+/**
+ * All currently registered dashboard widget ids, id => title.
+ */
+function szm_as_declutter_get_registered() {
+	global $wp_meta_boxes;
 
-	foreach ( $hidden as $id ) {
-		remove_meta_box( $id, 'dashboard', 'normal' );
-		remove_meta_box( $id, 'dashboard', 'side' );
+	$widgets = array();
+	if ( empty( $wp_meta_boxes['dashboard'] ) ) {
+		return $widgets;
 	}
 
-	// Site Health is never touched.
+	foreach ( $wp_meta_boxes['dashboard'] as $contexts ) {
+		foreach ( $contexts as $boxes ) {
+			foreach ( $boxes as $id => $box ) {
+				if ( $id && ! empty( $box['title'] ) ) {
+					$widgets[ $id ] = wp_strip_all_tags( $box['title'] );
+				}
+			}
+		}
+	}
+	return $widgets;
+}
+
+/**
+ * For the current user: any registered widget they haven't been shown
+ * before gets added to their hidden list (unless allow-listed), then gets
+ * marked seen so we never override their own choice about it again.
+ *
+ * Also updates a site-wide "known widgets" option so the settings screen
+ * can offer them as always-show choices.
+ */
+function szm_as_declutter_sync() {
+	$registered = szm_as_declutter_get_registered();
+	if ( empty( $registered ) ) {
+		return;
+	}
+
+	// Remember every widget id/title ever seen on this site, for the settings UI.
+	$known = get_option( 'szm_as_declutter_known_widgets', array() );
+	update_option( 'szm_as_declutter_known_widgets', array_merge( $known, $registered ), false );
+
+	$user_id = get_current_user_id();
+	if ( ! $user_id ) {
+		return;
+	}
+
+	$settings    = SZM_Admin_Suite::instance()->get_settings();
+	$always_show = isset( $settings['declutter']['always_show'] ) ? (array) $settings['declutter']['always_show'] : array();
+	$exempt      = array_merge( $always_show, szm_as_declutter_protected() );
+
+	$seen = (array) get_user_meta( $user_id, 'szm_as_declutter_seen', true );
+	$new  = array_diff( array_keys( $registered ), $seen, $exempt );
+
+	if ( $new ) {
+		$hidden = get_user_option( 'metaboxhidden_dashboard' );
+		$hidden = is_array( $hidden ) ? $hidden : array();
+		update_user_option( $user_id, 'metaboxhidden_dashboard', array_values( array_unique( array_merge( $hidden, $new ) ) ) );
+	}
+
+	update_user_meta( $user_id, 'szm_as_declutter_seen', array_values( array_unique( array_merge( $seen, array_keys( $registered ) ) ) ) );
 }
 
 function szm_as_declutter_sanitize( $input, $current ) {
-	$hideable = array_keys( szm_as_declutter_get_hideable() );
-	$hidden   = isset( $input['hidden_widgets'] ) && is_array( $input['hidden_widgets'] )
-		? array_values( array_intersect( $hideable, array_map( 'sanitize_key', $input['hidden_widgets'] ) ) )
+	$known = get_option( 'szm_as_declutter_known_widgets', array() );
+	$valid = array_keys( $known );
+	$show  = isset( $input['always_show'] ) && is_array( $input['always_show'] )
+		? array_values( array_intersect( $valid, array_map( 'sanitize_key', $input['always_show'] ) ) )
 		: array();
-	return array( 'hidden_widgets' => $hidden );
+	return array( 'always_show' => $show );
 }
 
 function szm_as_declutter_render( $settings ) {
-	$hideable   = szm_as_declutter_get_hideable();
-	$hidden     = isset( $settings['hidden_widgets'] ) ? (array) $settings['hidden_widgets'] : array();
-	$all_hidden = ! array_diff( array_keys( $hideable ), $hidden );
+	$known = get_option( 'szm_as_declutter_known_widgets', array() );
+	ksort( $known );
+	$show = isset( $settings['always_show'] ) ? (array) $settings['always_show'] : array();
 	?>
-	<p><?php esc_html_e( 'Tick the default dashboard widgets to hide. Unticking everything shows all of the defaults below. Site Health is always kept.', 'szm-admin-suite' ); ?></p>
+	<p><?php esc_html_e( 'Every dashboard widget not ticked here starts unchecked in each user\'s Screen Options — including new ones added later by a freshly installed plugin. Users can still tick any widget back on for themselves; we never override a choice they\'ve already made. Site Health always stays visible.', 'szm-admin-suite' ); ?></p>
 
-	<label style="display:block; margin-bottom:10px;">
-		<input type="checkbox" id="szm-as-declutter-defaults"
-			onchange="document.querySelectorAll('#szm-as-declutter-widgets input[type=checkbox]').forEach(function(cb){cb.checked=this.checked}.bind(this));"
-			<?php checked( $all_hidden ); ?> />
-		<strong><?php esc_html_e( 'Hide all defaults below', 'szm-admin-suite' ); ?></strong>
-	</label>
-
-	<fieldset id="szm-as-declutter-widgets" style="margin-left:20px;">
-		<?php foreach ( $hideable as $id => $label ) : ?>
-			<label style="display:block; margin-bottom:6px;">
-				<input type="checkbox"
-					name="<?php echo esc_attr( SZM_AS_OPTION ); ?>[declutter][hidden_widgets][]"
-					value="<?php echo esc_attr( $id ); ?>"
-					<?php checked( in_array( $id, $hidden, true ) ); ?> />
-				<?php echo esc_html( $label ); ?>
-			</label>
-		<?php endforeach; ?>
-	</fieldset>
+	<?php if ( empty( $known ) ) : ?>
+		<p class="description"><?php esc_html_e( 'No widgets seen yet — visit the Dashboard once to populate this list.', 'szm-admin-suite' ); ?></p>
+	<?php else : ?>
+		<fieldset>
+			<?php foreach ( $known as $id => $label ) : ?>
+				<?php if ( in_array( $id, szm_as_declutter_protected(), true ) ) continue; ?>
+				<label style="display:block; margin-bottom:6px;">
+					<input type="checkbox"
+						name="<?php echo esc_attr( SZM_AS_OPTION ); ?>[declutter][always_show][]"
+						value="<?php echo esc_attr( $id ); ?>"
+						<?php checked( in_array( $id, $show, true ) ); ?> />
+					<?php echo esc_html( $label ); ?>
+					<code style="color:#888;"><?php echo esc_html( $id ); ?></code>
+				</label>
+			<?php endforeach; ?>
+		</fieldset>
+	<?php endif; ?>
 	<?php
 }
