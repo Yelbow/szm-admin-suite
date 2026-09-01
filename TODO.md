@@ -81,6 +81,7 @@
 - [x] Visueel geverifieerd met screenshots (dashboard, plugins, post-new, profiel) naast de computed-style-scan.
 - [x] Versie gebumpt naar 1.0.5, tag + release.
 - [x] Gebruiker gaf direct tegengas op 1.0.5 ("full white" post-edit-scherm) — Gutenberg's eigen editor-chrome (toolbar, meta-box-wrapper, document-sidebar) bleek nooit aangepakt, ten onrechte als "buiten scope" bestempeld. Gefixt inclusief tweede-laags bug (donkere achtergrond legde zwarte Gutenberg-knoptekst bloot), Yoast's eigen postbox bewust licht gelaten. Versie 1.0.6, tag + release.
+- [x] Gebruiker gaf nogmaals tegengas: Yoast's keyphrase-invoerveld was donker (onze globale form-styling reikt overal in wp-admin) terwijl de rest van het Yoast-paneel licht bleef — inconsistent. Gebruiker gevraagd: volledig donker of volledig licht? Antwoord: consistent maken. Yoast's eigen inputs uitgesloten van onze donkere form-styling (`revert`) zodat het hele paneel weer licht-en-consistent oogt, i.p.v. het risico op Yoast's interne tekstkleuren overschrijven. Versie 1.0.7, tag + release.
 
 ## Nog te doen / niet gepland
 - [ ] Menu-restrictie-module overnemen uit `szm-admin-menu-manager` (pas na v1 bewezen).

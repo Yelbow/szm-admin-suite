@@ -523,6 +523,28 @@ div.updated.notice-alt {
 	box-shadow: 0 0 0 3px var(--szm-midnight-glow);
 	outline: none;
 }
+/* Yoast's SEO panel got left light on purpose (see .wpseo-metabox-content
+   above) because forcing its own text dark too would need overriding
+   dozens of their internal component colors — fragile, breaks on a Yoast
+   update. But our global dark-input rule above still reached its
+   keyphrase/description fields (`.wp-core-ui` is on <body>, not scoped),
+   giving a dark input inside an otherwise-light panel — worse than either
+   full light or full dark. Since going fully dark isn't worth the
+   maintenance risk, make the panel consistently light instead: let
+   Yoast's own inputs keep their native light styling. */
+.wpseo-metabox-content select,
+.wpseo-metabox-content input[type="text"],
+.wpseo-metabox-content input[type="url"],
+.wpseo-metabox-content input[type="email"],
+.wpseo-metabox-content input[type="password"],
+.wpseo-metabox-content input[type="search"],
+.wpseo-metabox-content input[type="number"],
+.wpseo-metabox-content textarea {
+	background: revert;
+	border: revert;
+	color: revert;
+	border-radius: revert;
+}
 
 /* ---- Login page ------------------------------------------------------- */
 body.login {
