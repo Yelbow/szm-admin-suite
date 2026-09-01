@@ -72,6 +72,15 @@
 - [x] Versie gebumpt naar 1.0.4, tag + release.
 - [ ] Zelfde audit + fixes herhalen voor `cyberpunk`, `kawaii`, `goth-baddie` (bewust uitgesteld tot na Midnight, user's expliciete scope-keuze).
 
+## Midnight contrast-naronde (2026-09-01, na gebruikersfeedback "contrasten bijblang niet alles goed")
+- [x] Automatische WCAG-contrastscanner gebouwd (`contrast-scan.js`, Playwright): 12 admin-schermen, elk tekst/achtergrond-paar op de pagina, effectieve (geërfde) achtergrond via DOM-parent-walk, echte WCAG-ratio-berekening.
+- [x] Root cause gevonden en gefixt: CSS-overerving vs. WP-core's expliciete `color`-regels op chrome-elementen (~130 treffers in één keer opgelost i.p.v. los gepatcht).
+- [x] Third-party tekstkleur-lek gefixt: eigen notice-tekst (Novamira e.d.), Yoast's lichte React-paneel, Gutenberg's lichte top-toolbar — laatste twee met correct-gescopede `color: initial !important` (na een tussentijdse regressie met een te brede selector, gevonden en gecorrigeerd).
+- [x] Badge-contrast (`.awaiting-mod`/`.update-plugins`/tellers) verbeterd naar een donkerdere achtergrondvariabele (was net onder 4.5:1).
+- [x] Volledige herscan: 128 → 8 resterende treffers, alle 8 bevestigde false positives (screen-reader-only tekst, Gutenberg's eigen Save-draft-knop, kleurenschema-preview-label) — geen echte contrastbugs meer.
+- [x] Visueel geverifieerd met screenshots (dashboard, plugins, post-new, profiel) naast de computed-style-scan.
+- [x] Versie gebumpt naar 1.0.5, tag + release.
+
 ## Nog te doen / niet gepland
 - [ ] Menu-restrictie-module overnemen uit `szm-admin-menu-manager` (pas na v1 bewezen).
 - [ ] Bezoekers-statistieken (bewust uitgesteld, "No stats in v1").

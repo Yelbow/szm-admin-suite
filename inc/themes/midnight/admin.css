@@ -40,6 +40,56 @@ body.wp-admin #wpwrap {
 	font-weight: 700;
 	letter-spacing: -0.01em;
 }
+/* WP core sets explicit color on most chrome text (headings, table cells,
+   descriptions, row-actions, footer) rather than leaving it to inherit from
+   body — an explicit rule on the element itself always wins over an
+   inherited value, regardless of specificity. So body.wp-admin { color }
+   alone never reaches these; every core text role needs its own explicit
+   retint. Found via an automated contrast scan (WCAG ratio, not eyeballed
+   screenshots) that turned up ~130 failing text/background pairs across
+   every core admin screen — column headers and row-action links were
+   near-black-on-dark-navy, effectively invisible. */
+body.wp-admin h1,
+body.wp-admin h2,
+body.wp-admin h3,
+body.wp-admin h4,
+body.wp-admin label,
+body.wp-admin p,
+body.wp-admin th,
+body.wp-admin td {
+	color: var(--szm-midnight-text);
+}
+body.wp-admin .description,
+body.wp-admin p.description,
+body.wp-admin span.description,
+body.wp-admin small,
+body.wp-admin .subsubsub li,
+body.wp-admin .subsubsub .count,
+body.wp-admin .row-actions,
+body.wp-admin .row-actions span,
+body.wp-admin .plugin-version-author-uri,
+#wpfooter,
+#wpfooter p {
+	color: var(--szm-midnight-muted);
+}
+body.wp-admin .row-actions a,
+body.wp-admin .button-link,
+#wpfooter a {
+	color: var(--szm-midnight-accent-2);
+}
+/* WP core's own semantic amber for the "needs attention" comment action
+   (#996800-ish) reads as near-invisible dark-brown on our dark surface —
+   same intent (amber = attention), lightened to stay legible here. */
+body.wp-admin .row-actions .unapprove a,
+body.wp-admin a.vim-u {
+	color: #e0a336 !important;
+}
+.widefat th.manage-column,
+.widefat thead td,
+.widefat th,
+.widefat thead th {
+	color: var(--szm-midnight-heading);
+}
 
 /* ---- Admin bar -------------------------------------------------------- */
 #wpadminbar {
@@ -173,8 +223,16 @@ body.wp-admin #wpwrap {
 	outline-offset: -2px;
 }
 #adminmenu .awaiting-mod,
-#adminmenu .update-plugins {
-	background: var(--szm-midnight-accent);
+#adminmenu .update-plugins,
+.awaiting-mod,
+.update-plugins,
+.update-count,
+.theme-count,
+.plugin-count {
+	/* accent-dk, not accent — plain accent scored 4.47:1 with white text,
+	   just under the 4.5:1 AA text threshold; accent-dk clears it while
+	   staying the same indigo family used elsewhere for "active/accent". */
+	background: var(--szm-midnight-accent-dk);
 	color: var(--szm-midnight-on-accent);
 	border-radius: 999px;
 }
@@ -280,6 +338,36 @@ body.wp-admin .postbox a:hover,
 body.login a:hover {
 	color: var(--szm-midnight-cyan);
 }
+/* Yoast SEO renders its own light-mode React UI inside the post-edit
+   metabox (a white card it fully controls) — our generic .postbox a rule
+   was painting its links/labels our cyan accent on top of Yoast's own
+   white background, a low-contrast pairing Yoast never intended and we
+   never asked for. Reset to Yoast's own colors instead of re-theming a
+   third-party app's internals. */
+/* Yoast's own light-mode content lives in .wpseo-metabox-content, nested
+   INSIDE the #wpseo_meta postbox (whose h2.hndle header we DO want themed —
+   that's ordinary WP postbox chrome, not Yoast's React UI). An earlier,
+   broader [class*="wpseo-"]/[id*="wpseo"] attribute-selector version of
+   this reset was wrong: it also matched unrelated WP-core-rendered
+   elements that merely contain "wpseo" in an id/class (the postbox heading
+   itself, and .column-wpseo-links table cells on the posts list), blanking
+   their color too. Scope strictly to the actual React content wrapper. */
+.wpseo-metabox-content,
+.wpseo-metabox-content * {
+	color: initial !important;
+}
+/* Gutenberg's own top toolbar (document title/post-card panel) is native
+   WP-core light-mode UI with a white/light-gray background we never touch
+   — same leak as Yoast above: our global text-color rules were painting
+   our light theme-text color onto it, going invisible-on-white instead of
+   WP's own dark default. Reset color only, leave Gutenberg's own chrome
+   otherwise alone (it isn't part of "the admin menu" this pass targets). */
+.editor-document-bar,
+.editor-document-bar *,
+.editor-post-card-panel,
+.editor-post-card-panel * {
+	color: initial !important;
+}
 
 /* ---- Settings tabs ---------------------------------------------------- */
 .nav-tab-wrapper {
@@ -310,6 +398,19 @@ div.error {
 	border-color: var(--szm-midnight-border);
 	border-radius: 12px;
 	box-shadow: 0 4px 12px var(--szm-midnight-shadow);
+}
+/* Some plugins (e.g. Novamira) set a literal near-black text color on their
+   own notice markup (p/strong inside .notice), which — same specificity
+   trap as the .notice-warning fix below — a source-order/specificity win
+   for a third-party plugin we can't predict or match selector-for-selector.
+   !important is deliberate here: the alternative is unreadable near-black
+   text on our dark surface for any plugin notice we didn't anticipate. */
+.notice p,
+.notice strong,
+.notice span:not(.dashicons):not(.screen-reader-text),
+div.updated p,
+div.error p {
+	color: var(--szm-midnight-text) !important;
 }
 /* WP core's .notice-warning/-error/-success/-info (and their .notice-alt
    pairing, e.g. the "there is a new version available" row inside the
