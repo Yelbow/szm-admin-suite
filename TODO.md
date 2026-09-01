@@ -63,6 +63,15 @@
 - [x] Geverifieerd met een echte browser-login + ruwe HTML-inspectie (niet alleen function-level `wp eval`): Yoast-widgets krijgen `hide-if-js` op de postbox-div en hun Screen-Options-checkbox staat uit; Welcome/Recommendations/Site Health blijven aan.
 - [x] Versie gebumpt naar 1.0.3, tag + release.
 
+## Midnight menu-QA-pass (2026-09-01, na gebruikersfeedback "hovers/states kloppen niet, witte achtergronden, verkeerde contrasten")
+- [x] Herbruikbaar audit-script gebouwd (`menu-audit.js`, Playwright): 6 schermen × 5 states (rust, hover×3, submenu-flyout, keyboard-focus, ingeklapte-sidebar-flyout) = 38 screenshots + computed-style-checks.
+- [x] Ontbrekende `:focus`-state op submenu-links toegevoegd (was alleen `:hover`).
+- [x] Ontbrekende `:focus-visible`-ring toegevoegd op top-level én submenu-links (WCAG 2.4.7), apart van hover.
+- [x] Witte achtergrond op plugin-update-notices (`.notice-warning` e.d.) gefixt — WP-core compound-selector-specificiteit versloeg het thema; override toegevoegd die core's varianten matcht/overtreft.
+- [x] Volledige pass op verse, tijdstempel-geverifieerde screenshot-batch: geen overige issues gevonden.
+- [x] Versie gebumpt naar 1.0.4, tag + release.
+- [ ] Zelfde audit + fixes herhalen voor `cyberpunk`, `kawaii`, `goth-baddie` (bewust uitgesteld tot na Midnight, user's expliciete scope-keuze).
+
 ## Nog te doen / niet gepland
 - [ ] Menu-restrictie-module overnemen uit `szm-admin-menu-manager` (pas na v1 bewezen).
 - [ ] Bezoekers-statistieken (bewust uitgesteld, "No stats in v1").

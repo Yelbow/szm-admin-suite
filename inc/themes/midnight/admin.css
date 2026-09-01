@@ -102,6 +102,14 @@ body.wp-admin #wpwrap {
 #adminmenu li.menu-top > a.menu-top:focus div.wp-menu-image::before {
 	color: var(--szm-midnight-accent-2);
 }
+/* keyboard focus needs its own visible indicator, distinct from :hover —
+   a filled background alone doesn't tell a keyboard user where they are
+   (WCAG 2.4.7). Ring reuses the theme's own accent-2/cyan pair so it reads
+   as "this theme's focus color", not a generic browser default. */
+#adminmenu li.menu-top > a.menu-top:focus-visible {
+	outline: 2px solid var(--szm-midnight-accent-2);
+	outline-offset: -2px;
+}
 /* active item = indigo pill */
 #adminmenu li.current > a.menu-top,
 #adminmenu li.wp-has-current-submenu > a.wp-has-current-submenu,
@@ -124,13 +132,20 @@ body.wp-admin #wpwrap {
 #adminmenu .wp-menu-arrow div {
 	display: none;
 }
-/* inline (open, current) submenu = soft inset panel */
+/* inline (open, current) submenu = soft inset panel
+   WP core sets a fixed width (160px) on .wp-submenu for the flyout case;
+   in this floating-pill layout the parent <li> is inset 10px each side, so
+   without overriding width the inline/open panel overhangs the pill on
+   both edges. box-sizing: border-box + width: auto lets it fill exactly
+   the space left by its own margin, matching the pill above it. */
 #adminmenu li.wp-has-current-submenu.wp-menu-open > .wp-submenu {
 	background: var(--szm-midnight-surface);
 	border-radius: 12px;
-	margin: 4px 0 4px 4px;
+	margin: 4px;
 	padding: 6px;
 	box-shadow: none;
+	width: auto;
+	box-sizing: border-box;
 }
 #adminmenu li.menu-top .wp-submenu {
 	border-radius: 12px;
@@ -145,9 +160,17 @@ body.wp-admin #wpwrap {
 	color: var(--szm-midnight-muted);
 }
 #adminmenu .wp-submenu li.current a,
-#adminmenu .wp-submenu a:hover {
+#adminmenu .wp-submenu a:hover,
+#adminmenu .wp-submenu a:focus {
 	color: var(--szm-midnight-accent-2);
 	background: var(--szm-midnight-surface-2);
+}
+/* same rationale as the top-level ring above: submenu links previously had
+   no :focus state at all, so tabbing through an open submenu gave zero
+   feedback. Bg/color match hover; the ring is the keyboard-only signal. */
+#adminmenu .wp-submenu a:focus-visible {
+	outline: 2px solid var(--szm-midnight-accent-2);
+	outline-offset: -2px;
 }
 #adminmenu .awaiting-mod,
 #adminmenu .update-plugins {
@@ -287,6 +310,50 @@ div.error {
 	border-color: var(--szm-midnight-border);
 	border-radius: 12px;
 	box-shadow: 0 4px 12px var(--szm-midnight-shadow);
+}
+/* WP core's .notice-warning/-error/-success/-info (and their .notice-alt
+   pairing, e.g. the "there is a new version available" row inside the
+   plugins-list table) are two-class selectors — more specific than the
+   single-class .notice rule above, so core's cream/white background was
+   winning and leaving our light notice text unreadable on white. Same
+   specificity level as core's own selectors so this reliably wins;
+   border-left keeps WP's semantic color coding (amber/red/green/blue),
+   just tuned lighter to stay visible on the dark surface. */
+.notice-warning,
+.notice-warning.notice-alt,
+.notice-error,
+.notice-error.notice-alt,
+.notice-success,
+.notice-success.notice-alt,
+.notice-info,
+.notice-info.notice-alt,
+div.error,
+div.updated.notice-alt {
+	background: var(--szm-midnight-surface-2);
+	color: var(--szm-midnight-text);
+	border-left-width: 4px;
+	border-left-style: solid;
+}
+.notice-warning,
+.notice-warning.notice-alt {
+	border-left-color: #e0a336;
+}
+.notice-error,
+.notice-error.notice-alt,
+div.error {
+	border-left-color: #f16a6a;
+}
+.notice-success,
+.notice-success.notice-alt,
+div.updated.notice-alt {
+	border-left-color: #4ade80;
+}
+.notice-info,
+.notice-info.notice-alt {
+	border-left-color: var(--szm-midnight-accent-2);
+}
+.notice a {
+	color: var(--szm-midnight-accent-2);
 }
 
 /* ---- Forms ------------------------------------------------------------ */
