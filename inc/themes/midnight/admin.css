@@ -356,17 +356,62 @@ body.login a:hover {
 .wpseo-metabox-content * {
 	color: initial !important;
 }
-/* Gutenberg's own top toolbar (document title/post-card panel) is native
-   WP-core light-mode UI with a white/light-gray background we never touch
-   — same leak as Yoast above: our global text-color rules were painting
-   our light theme-text color onto it, going invisible-on-white instead of
-   WP's own dark default. Reset color only, leave Gutenberg's own chrome
-   otherwise alone (it isn't part of "the admin menu" this pass targets). */
+/* The post-editor screen's OWN chrome (not Yoast's, not Gutenberg's white
+   writing canvas — that's an iframe with its own document, mirrors the
+   front end on purpose, and this CSS can't reach inside it anyway) was
+   still rendering white: the top toolbar bar, the wrapper around classic
+   meta boxes, WP core's own explicit white background on `.postbox .inside`
+   (except Yoast's own postbox — see the .wpseo-metabox-content rule above,
+   deliberately left alone), and the whole right-hand document sidebar.
+   These are all plain wp-admin/Gutenberg DOM we already theme elsewhere on
+   other screens — just missed here. Darkening the background then exposed
+   a second layer of bugs: Gutenberg sets near-black button/label text
+   explicitly (its own default for a white toolbar/sidebar), so once the
+   background went dark that text went invisible — same inheritance-vs-
+   explicit-rule trap as the rest of this pass, needs its own explicit
+   override rather than relying on inheriting our themed text color. */
+.editor-header.edit-post-header,
+.edit-post-meta-boxes-main,
+.editor-sidebar,
+.editor-sidebar__panel.components-panel,
+.interface-interface-skeleton__sidebar {
+	background: var(--szm-midnight-bg);
+	color: var(--szm-midnight-text);
+}
+.postbox .inside {
+	background: var(--szm-midnight-surface);
+}
+.editor-header *,
+.edit-post-meta-boxes-main .components-panel__body-toggle,
+.edit-post-meta-boxes-main__presenter > button,
+.editor-sidebar * {
+	color: var(--szm-midnight-text);
+}
+.editor-sidebar__panel.components-panel .components-panel__body-title,
+.editor-sidebar__panel.components-panel label,
+.editor-sidebar .components-panel__body-toggle,
+.edit-post-meta-boxes-main .components-panel__body-toggle,
+.edit-post-meta-boxes-main__presenter > button {
+	color: var(--szm-midnight-heading);
+}
+.editor-sidebar .components-button.is-link,
+.editor-sidebar .components-button.is-tertiary,
+.editor-sidebar .editor-post-status__toggle,
+.editor-sidebar .editor-post-schedule__dialog-toggle,
+.editor-sidebar .editor-post-url__panel-toggle,
+.editor-sidebar .components-dropdown-menu__toggle,
+.editor-sidebar .editor-post-discussion__panel-toggle,
+.editor-sidebar .dp-editor-post-copy-to-draft,
+.editor-sidebar a {
+	color: var(--szm-midnight-accent-2);
+}
+/* The "No title · Post" pill in the toolbar center, and the Post/Block
+   tab bar at the top of the sidebar, each paint their own light-gray/
+   white background independent of their (now dark) container — same
+   explicit-own-background pattern as `.postbox .inside`/Yoast above. */
 .editor-document-bar,
-.editor-document-bar *,
-.editor-post-card-panel,
-.editor-post-card-panel * {
-	color: initial !important;
+.editor-sidebar__panel-tabs {
+	background: var(--szm-midnight-surface) !important;
 }
 
 /* ---- Settings tabs ---------------------------------------------------- */

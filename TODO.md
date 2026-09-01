@@ -80,6 +80,7 @@
 - [x] Volledige herscan: 128 → 8 resterende treffers, alle 8 bevestigde false positives (screen-reader-only tekst, Gutenberg's eigen Save-draft-knop, kleurenschema-preview-label) — geen echte contrastbugs meer.
 - [x] Visueel geverifieerd met screenshots (dashboard, plugins, post-new, profiel) naast de computed-style-scan.
 - [x] Versie gebumpt naar 1.0.5, tag + release.
+- [x] Gebruiker gaf direct tegengas op 1.0.5 ("full white" post-edit-scherm) — Gutenberg's eigen editor-chrome (toolbar, meta-box-wrapper, document-sidebar) bleek nooit aangepakt, ten onrechte als "buiten scope" bestempeld. Gefixt inclusief tweede-laags bug (donkere achtergrond legde zwarte Gutenberg-knoptekst bloot), Yoast's eigen postbox bewust licht gelaten. Versie 1.0.6, tag + release.
 
 ## Nog te doen / niet gepland
 - [ ] Menu-restrictie-module overnemen uit `szm-admin-menu-manager` (pas na v1 bewezen).
