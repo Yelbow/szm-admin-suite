@@ -289,8 +289,17 @@ body.wp-admin a.vim-u {
 }
 
 /* ---- Buttons ---------------------------------------------------------- */
+/* .page-title-action (WP core's "Add New" button next to a screen's <h1>,
+   and reused by other plugins for their own equivalent buttons — e.g. Real
+   Media Library's "new folder" buttons) ships its own light-gray bg/border
+   independent of .button/.button-secondary, so it fell outside this rule
+   entirely and stayed a near-white box against our dark chrome wherever it
+   appeared — not just RML's panel, any "Add New" heading button anywhere
+   in wp-admin. */
 .wp-core-ui .button,
-.wp-core-ui .button-secondary {
+.wp-core-ui .button-secondary,
+.wp-core-ui .page-title-action,
+.wp-core-ui .page-title-action.add-new-h2 {
 	color: var(--szm-midnight-text);
 	border: 1px solid var(--szm-midnight-border-2);
 	background: var(--szm-midnight-surface-2);
@@ -299,6 +308,18 @@ body.wp-admin a.vim-u {
 	min-height: 34px;
 	line-height: 32px;
 	transition: box-shadow .15s ease, transform .15s ease;
+}
+/* .page-title-action.add-new-h2 (two classes) is exactly as specific as
+   our rule above, so which one wins depends purely on enqueue order —
+   RML enqueues its own copy of this class after ours on the Media Library
+   screen, so the plain rule above lost silently there. !important forces
+   the win regardless of enqueue order, the same tradeoff already made for
+   WP core's compound .notice-* selectors elsewhere in this file. */
+.wp-core-ui .page-title-action,
+.wp-core-ui .page-title-action.add-new-h2 {
+	background: var(--szm-midnight-surface-2) !important;
+	border-color: var(--szm-midnight-border-2) !important;
+	color: var(--szm-midnight-text) !important;
 }
 .wp-core-ui .button:hover,
 .wp-core-ui .button-secondary:hover {
@@ -394,6 +415,20 @@ body.login a:hover {
 .edit-post-meta-boxes-main__presenter > button {
 	color: var(--szm-midnight-heading);
 }
+/* The "Meta Boxes" drawer's own header/drag-handle bar
+   (.edit-post-meta-boxes-main__presenter) had no card-style treatment of
+   its own — it just inherited the plain dark page background set above,
+   so next to the .postbox cards it contains (which DO get a surface bg,
+   border and rounded corners) it read as a flat, unstyled bar rather than
+   part of the same card system. Give it the same surface/border/radius
+   treatment as .postbox's own header so the drawer reads as one cohesive
+   card, not a bare strip sitting above styled content. */
+.edit-post-meta-boxes-main__presenter {
+	background: var(--szm-midnight-surface);
+	border: 1px solid var(--szm-midnight-border);
+	border-radius: var(--szm-midnight-radius) var(--szm-midnight-radius) 0 0;
+	padding: 8px 12px;
+}
 .editor-sidebar .components-button.is-link,
 .editor-sidebar .components-button.is-tertiary,
 .editor-sidebar .editor-post-status__toggle,
@@ -412,6 +447,126 @@ body.login a:hover {
 .editor-document-bar,
 .editor-sidebar__panel-tabs {
 	background: var(--szm-midnight-surface) !important;
+}
+
+/* ---- Media Library (core toolbar + attachment modal) ------------------
+   This is plain core wp-admin UI (`.media-frame`/`.media-modal`/
+   `.media-toolbar`/`.attachments-browser`), not a third-party plugin's own
+   React app — no fragility concern about "breaking on a plugin update"
+   applies, so theme it directly like any other core screen instead of
+   leaving it out of scope. It was left white before because the grid/list
+   view and the "Add New Media" modal render through their own Backbone
+   views rather than the ordinary post-list/postbox markup already covered
+   above, so none of those selectors reached them. The modal's own form
+   fields (title/caption/alt text in the attachment-details sidebar) were
+   already being darkened by the global `.wp-core-ui input[type=...]` rule
+   below — that's why they showed up dark against an otherwise still-white
+   modal, the exact "mismatched" look reported. Theming the modal itself
+   resolves that mismatch instead of reverting the inputs back to light. */
+.media-frame,
+.media-frame-content,
+.media-frame-router,
+.media-frame-menu,
+.media-frame-title,
+.media-toolbar,
+.media-toolbar.wp-filter,
+.media-toolbar-primary,
+.media-toolbar-secondary,
+.attachments-browser,
+.attachments-browser .attachments,
+.media-sidebar,
+.media-modal,
+.media-modal-content,
+.attachment-details,
+.compat-item {
+	background: var(--szm-midnight-bg);
+	color: var(--szm-midnight-text);
+}
+.media-frame-title h1,
+.attachment-details .attachment-info,
+.attachment-details label,
+.attachment-details .setting label,
+.compat-item label {
+	color: var(--szm-midnight-text);
+}
+.media-modal-close .media-modal-icon::before {
+	color: var(--szm-midnight-muted);
+}
+.attachments-browser .attachment {
+	color: var(--szm-midnight-text);
+}
+.attachments-browser .attachment .thumbnail,
+.attachments-browser .attachment-preview {
+	background: var(--szm-midnight-surface);
+}
+.attachments-browser .attachment.selected .thumbnail {
+	outline: 3px solid var(--szm-midnight-accent);
+}
+
+/* ---- Real Media Library plugin (third-party React/Ant Design tree) ----
+   Scoping decision: theme it, not revert-to-native. Unlike Yoast's SEO
+   panel (left light — see the .wpseo-metabox-content note above), RML's
+   folder tree is a plain nav/browse UI with no dense internal component
+   styling to fight — a background/border/text retint is enough to make it
+   match, without needing to fight dozens of Ant Design internals the way a
+   full form panel would. If a future RML update makes this fragile, the
+   fallback is the same `revert` pattern used for Yoast. */
+.rml-container,
+.rml-antd-app,
+.rml-container .sticky-inner-wrapper,
+.rml-container .aiot-tree,
+.rml-container .aiot-toolbar {
+	background: var(--szm-midnight-surface) !important;
+	color: var(--szm-midnight-text);
+}
+.rml-container,
+.rml-antd-app {
+	border-right: 1px solid var(--szm-midnight-border);
+}
+.rml-container *,
+.rml-antd-app * {
+	color: var(--szm-midnight-text);
+}
+.rml-container .ant-tree-node-content-wrapper:hover,
+.rml-container .ant-tree-treenode:hover {
+	background: var(--szm-midnight-surface-2) !important;
+}
+.rml-container .ant-tree-node-selected,
+.rml-container .ant-tree-node-content-wrapper-selected {
+	background: var(--szm-midnight-surface-2) !important;
+	color: var(--szm-midnight-accent-2) !important;
+}
+/* Folder item counts ("66", "11", …) render as white text on RML's own
+   light-gray count-pill background — 2.6:1, below the 4.5:1 text minimum.
+   Found by contrast-scan.js, not visible eyeballing a screenshot (the pill
+   is small and the fail is a "washed out" rather than "invisible" look).
+   Match the accent-dk pill pattern used for update-count/theme-count
+   elsewhere so it reads as this theme's own badge style. */
+.rml-container .aiot-node-count {
+	background: var(--szm-midnight-accent-dk) !important;
+	color: var(--szm-midnight-on-accent) !important;
+}
+.rml-container .ant-btn,
+.rml-container button {
+	background: var(--szm-midnight-surface-2);
+	border: 1px solid var(--szm-midnight-border-2);
+	color: var(--szm-midnight-text);
+}
+/* The folder-search field is Ant Design's <Input> component, which wraps
+   the actual <input> in its own affix span that carries the visible
+   white background (the bare <input> itself is transparent) — same
+   "container, not the element you're looking at" trap as the rest of RML.
+   Antd v5+ also renders these classes twice: once with an `ant-` prefix,
+   once with `rml-antd-` (RML's own build namespaces its copy of antd to
+   avoid clashing with any other antd version WP might load) — both are
+   covered here since either could be present depending on version. */
+.rml-container .ant-input-affix-wrapper,
+.rml-container .rml-antd-input-affix-wrapper,
+.rml-container .ant-input,
+.rml-container .rml-antd-input {
+	background: var(--szm-midnight-surface-2) !important;
+	border-color: var(--szm-midnight-border-2) !important;
+	color: var(--szm-midnight-text) !important;
 }
 
 /* ---- Settings tabs ---------------------------------------------------- */
@@ -503,6 +658,19 @@ div.updated.notice-alt {
 }
 
 /* ---- Forms ------------------------------------------------------------ */
+/* An <input> with no `type` attribute at all defaults to type=text per the
+   HTML spec, but it doesn't match any of the input[type="..."] selectors
+   below — those need an actual attribute value present. WP core and most
+   plugins always set an explicit type, but some third-party React/
+   styled-components UI renders a bare <input>, which then falls fully
+   outside this list and stays unthemed (white bg, black text) even though
+   .wp-core-ui sits on <body> and should otherwise reach everywhere. Found
+   live on post-new.php. `:not([type])` catches exactly that case without
+   touching checkbox/radio/submit/button/reset/file/range/image/hidden,
+   which all keep their native styling on purpose. Also added a few input
+   types this list never had (date/tel/color/datetime-local/month/week/
+   time) for the same reason — anything with an explicit but unlisted type
+   was equally falling through. */
 .wp-core-ui select,
 .wp-core-ui input[type="text"],
 .wp-core-ui input[type="url"],
@@ -510,6 +678,14 @@ div.updated.notice-alt {
 .wp-core-ui input[type="password"],
 .wp-core-ui input[type="search"],
 .wp-core-ui input[type="number"],
+.wp-core-ui input[type="tel"],
+.wp-core-ui input[type="date"],
+.wp-core-ui input[type="datetime-local"],
+.wp-core-ui input[type="month"],
+.wp-core-ui input[type="week"],
+.wp-core-ui input[type="time"],
+.wp-core-ui input[type="color"],
+.wp-core-ui input:not([type]),
 .wp-core-ui textarea {
 	background: var(--szm-midnight-surface-2);
 	border: 1px solid var(--szm-midnight-border-2);
@@ -539,6 +715,16 @@ div.updated.notice-alt {
 .wpseo-metabox-content input[type="password"],
 .wpseo-metabox-content input[type="search"],
 .wpseo-metabox-content input[type="number"],
+/* Yoast's own slug-editor field (the "Slug" input in its Google preview,
+   e.g. #yoast-google-preview-slug-metabox) is React/styled-components
+   markup with no `type` attribute at all — it fell outside this revert
+   list the same way it fell outside the global input[type="..."] list
+   (see the `:not([type])` note above), so it kept picking up our global
+   dark background while Yoast's own stylesheet kept its black text: a
+   black-on-dark-blue field, unreadable and worse than either full theme.
+   Needs the same :not([type]) catch-all here so it reverts to Yoast's
+   native (light) styling along with the rest of this panel. */
+.wpseo-metabox-content input:not([type]),
 .wpseo-metabox-content textarea {
 	background: revert;
 	border: revert;
