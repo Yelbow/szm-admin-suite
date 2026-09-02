@@ -10,6 +10,12 @@
  * the widget is still there and each user can tick it back on for
  * themselves via Screen Options. Once a user has made a choice about a
  * given widget, we never touch that choice again.
+ *
+ * Also (optionally, default on): strips non-essential admin notices —
+ * mainly the promo/upsell banners plugins print on their own initiative
+ * ("X Pro is here", cross-sell CTAs) — before they render. Real errors, WP
+ * core's own update/security nags, and this plugin's own notices are always
+ * kept; see szm_as_declutter_keep_notice().
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,15 +25,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 szm_as_register_module( array(
 	'slug'            => 'declutter',
 	'name'            => __( 'Declutter', 'szm-admin-suite' ),
-	'description'     => __( 'Keeps new dashboard widgets (including ones added by newly installed plugins) unchecked in Screen Options by default. Site Health, Welcome and Plugin Recommendations always stay visible.', 'szm-admin-suite' ),
+	'description'     => __( 'Keeps new dashboard widgets (including ones added by newly installed plugins) unchecked in Screen Options by default, and strips non-essential plugin promo/upsell notices. Site Health, Welcome, Plugin Recommendations, real errors, and WP core\'s own update nags always stay visible.', 'szm-admin-suite' ),
 	'icon'            => 'dashicons-visibility',
 	'default_enabled' => true,
 	'boot'            => 'szm_as_declutter_boot',
 	'settings'        => array(
-		'always_show' => array(
+		'always_show'      => array(
 			'szm_as_dashboard_welcome',
 			'szm_as_dashboard_recommendations',
 		),
+		'suppress_notices' => true,
 	),
 	'tab_title'       => __( 'Declutter', 'szm-admin-suite' ),
 	'render'          => 'szm_as_declutter_render',
@@ -41,7 +48,7 @@ function szm_as_declutter_protected() {
 	return array( 'dashboard_site_health' );
 }
 
-function szm_as_declutter_boot() {
+function szm_as_declutter_boot( $settings = array() ) {
 	if ( ! is_admin() ) {
 		return;
 	}
@@ -52,6 +59,112 @@ function szm_as_declutter_boot() {
 	// that function. Hook the same action at the latest possible priority
 	// so we run after every one of them, regardless of the priority they used.
 	add_action( 'wp_dashboard_setup', 'szm_as_declutter_sync', PHP_INT_MAX );
+
+	// Notice suppression: never during AJAX/REST (no notice markup renders
+	// there anyway, and buffering an AJAX response is asking for trouble).
+	if ( empty( $settings['suppress_notices'] ) || wp_doing_ajax() ) {
+		return;
+	}
+	// admin_notices and all_admin_notices are two separate do_action() calls
+	// in wp-admin/admin-header.php (core notices use the former, "every
+	// admin screen" plugin notices often use the latter) — buffer both. On
+	// each hook we add our own callback at the earliest possible priority
+	// (to open the buffer before any other callback on that hook has
+	// printed anything) and again at the latest possible priority (to close
+	// it after every other callback has printed its notice), so everything
+	// any other plugin prints on that hook lands inside the buffer we then
+	// filter, regardless of what priority it used.
+	foreach ( array( 'admin_notices', 'all_admin_notices' ) as $hook ) {
+		add_action( $hook, 'szm_as_declutter_notice_buffer_start', -9999 );
+		add_action( $hook, 'szm_as_declutter_notice_buffer_end', PHP_INT_MAX );
+	}
+}
+
+function szm_as_declutter_notice_buffer_start() {
+	ob_start();
+}
+
+function szm_as_declutter_notice_buffer_end() {
+	$html = ob_get_clean();
+	echo szm_as_declutter_filter_notices( $html ); // phpcs:ignore WordPress.Security.EscapeOutput -- already-rendered admin HTML, filtered below, not user input.
+}
+
+/**
+ * Strip non-essential notice <div>s out of a chunk of already-rendered
+ * admin_notices/all_admin_notices HTML. Uses DOMDocument rather than a
+ * hand-rolled regex — notice markup regularly contains its own nested
+ * <div>s (buttons, dismiss icons), which a naive regex match would cut off
+ * at the first "</div>" instead of the notice's real closing tag.
+ */
+function szm_as_declutter_filter_notices( $html ) {
+	$html = trim( (string) $html );
+	if ( '' === $html || ! class_exists( 'DOMDocument' ) ) {
+		return $html;
+	}
+
+	// DOMDocument needs a full document to parse a fragment reliably
+	// (otherwise libxml's HTML5 recovery heuristics can reparent or drop
+	// pieces of it); the explicit UTF-8 meta tag stops loadHTML() from
+	// mangling multibyte text, since it otherwise assumes Latin-1.
+	$wrapped = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>' . $html . '</body></html>';
+
+	libxml_use_internal_errors( true );
+	$dom    = new DOMDocument();
+	$loaded = $dom->loadHTML( $wrapped, LIBXML_NOERROR | LIBXML_NOWARNING );
+	libxml_clear_errors();
+
+	if ( ! $loaded ) {
+		return $html; // Malformed markup: fail open rather than risk eating real content.
+	}
+
+	$xpath = new DOMXPath( $dom );
+	$nodes = $xpath->query(
+		"//div[contains(concat(' ', normalize-space(@class), ' '), ' notice ')" .
+		" or contains(concat(' ', normalize-space(@class), ' '), ' updated ')" .
+		" or contains(concat(' ', normalize-space(@class), ' '), ' error ')]"
+	);
+
+	foreach ( $nodes as $node ) {
+		// Only ever act on a top-level notice div, never a div that merely
+		// has one of these class names nested somewhere inside a notice
+		// we're already keeping (or discarding).
+		if ( ! $node->parentNode || 'body' !== $node->parentNode->nodeName ) {
+			continue;
+		}
+		$classes = (string) $node->getAttribute( 'class' );
+		if ( szm_as_declutter_keep_notice( $classes, $dom->saveHTML( $node ) ) ) {
+			continue;
+		}
+		$node->parentNode->removeChild( $node );
+	}
+
+	$body = $dom->getElementsByTagName( 'body' )->item( 0 );
+	$out  = '';
+	foreach ( $body->childNodes as $child ) {
+		$out .= $dom->saveHTML( $child );
+	}
+	return $out;
+}
+
+/**
+ * Safelist: real problems and WP's own essential nags always stay visible,
+ * everything else (mainly plugin promo/upsell banners) gets stripped.
+ */
+function szm_as_declutter_keep_notice( $classes, $notice_html ) {
+	// Never hide a real error.
+	if ( preg_match( '/\b(error|notice-error)\b/', $classes ) ) {
+		return true;
+	}
+	// WP core's own update/security/translation nags.
+	if ( preg_match( '/\b(update-nag|update-message|translation-nag|plugin-update-tr)\b/', $classes ) ) {
+		return true;
+	}
+	// This plugin's own notices, and anything from WordPress core update
+	// checks specifically (identifiable by their own markup, not just class).
+	if ( false !== strpos( $notice_html, 'szm-as-' ) || false !== strpos( $notice_html, 'szm_as_' ) ) {
+		return true;
+	}
+	return false;
 }
 
 /**
@@ -122,14 +235,31 @@ function szm_as_declutter_sanitize( $input, $current ) {
 	$show  = isset( $input['always_show'] ) && is_array( $input['always_show'] )
 		? array_values( array_intersect( $valid, array_map( 'sanitize_key', $input['always_show'] ) ) )
 		: array();
-	return array( 'always_show' => $show );
+	return array(
+		'always_show'      => $show,
+		// Checkbox: absent from $input entirely when unchecked, so this
+		// correctly turns it off rather than falling back to the default.
+		'suppress_notices' => ! empty( $input['suppress_notices'] ),
+	);
 }
 
 function szm_as_declutter_render( $settings ) {
-	$known = get_option( 'szm_as_declutter_known_widgets', array() );
+	$known    = get_option( 'szm_as_declutter_known_widgets', array() );
 	ksort( $known );
-	$show = isset( $settings['always_show'] ) ? (array) $settings['always_show'] : array();
+	$show     = isset( $settings['always_show'] ) ? (array) $settings['always_show'] : array();
+	$suppress = ! isset( $settings['suppress_notices'] ) || ! empty( $settings['suppress_notices'] );
 	?>
+	<h3><?php esc_html_e( 'Plugin notices', 'szm-admin-suite' ); ?></h3>
+	<label style="display:block; margin-bottom:12px;">
+		<input type="checkbox"
+			name="<?php echo esc_attr( SZM_AS_OPTION ); ?>[declutter][suppress_notices]"
+			value="1"
+			<?php checked( $suppress ); ?> />
+		<?php esc_html_e( 'Hide non-essential plugin notices (promo/upsell banners) admin-wide', 'szm-admin-suite' ); ?>
+	</label>
+	<p class="description"><?php esc_html_e( 'Real errors and WordPress\'s own update/security notices always stay visible — this only strips banners plugins print on their own initiative (e.g. "X Pro is here").', 'szm-admin-suite' ); ?></p>
+
+	<h3><?php esc_html_e( 'Dashboard widgets', 'szm-admin-suite' ); ?></h3>
 	<p><?php esc_html_e( 'Every dashboard widget not ticked here starts unchecked in each user\'s Screen Options — including new ones added later by a freshly installed plugin. Users can still tick any widget back on for themselves; we never override a choice they\'ve already made. Site Health always stays visible.', 'szm-admin-suite' ); ?></p>
 
 	<?php if ( empty( $known ) ) : ?>

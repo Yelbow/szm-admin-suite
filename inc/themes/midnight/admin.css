@@ -572,6 +572,10 @@ body.login a:hover {
 /* ---- Settings tabs ---------------------------------------------------- */
 .nav-tab-wrapper {
 	border-bottom: 1px solid var(--szm-midnight-border);
+	/* Breathing room before the settings card below — core's own
+	   .nav-tab-wrapper carries no bottom margin, so without this the tab
+	   row sat flush against the content underneath it. */
+	margin-bottom: 20px;
 }
 .nav-tab-wrapper .nav-tab {
 	background: var(--szm-midnight-surface-2);
@@ -579,6 +583,16 @@ body.login a:hover {
 	color: var(--szm-midnight-muted);
 	border-radius: 999px;
 	margin-right: 6px;
+}
+/* Inactive tabs previously had zero hover/focus feedback — only the active
+   tab's gradient carried a (redundant) :hover rule. Step up to the
+   -border-2 tone for a visible-but-subtle lift, and brighten text from
+   -muted to -text so the hover state doesn't read as an accidental no-op. */
+.nav-tab-wrapper .nav-tab:not(.nav-tab-active):hover,
+.nav-tab-wrapper .nav-tab:not(.nav-tab-active):focus {
+	background: var(--szm-midnight-border-2);
+	border-color: var(--szm-midnight-border-2);
+	color: var(--szm-midnight-text);
 }
 .nav-tab-wrapper .nav-tab-active,
 .nav-tab-wrapper .nav-tab-active:hover,
@@ -691,6 +705,19 @@ div.updated.notice-alt {
 	border: 1px solid var(--szm-midnight-border-2);
 	color: var(--szm-midnight-text);
 	border-radius: 10px;
+}
+/* Checkbox/radio are deliberately excluded from the rule above (they need
+   a different treatment, not text-input darkening) — but nothing replaced
+   them either, so they fell back to WP core's own *explicit* white
+   background (same inheritance-vs-explicit trap as the notices below),
+   rendering as a plain white square on every dark surface. `!important`
+   beats that explicit core styling; `accent-color` themes the check/dot
+   mark itself, which native rendering otherwise ignores entirely. */
+.wp-core-ui input[type="checkbox"],
+.wp-core-ui input[type="radio"] {
+	background-color: var(--szm-midnight-surface-2) !important;
+	border: 1px solid var(--szm-midnight-border-2) !important;
+	accent-color: var(--szm-midnight-accent);
 }
 .wp-core-ui select:focus,
 .wp-core-ui input:focus,
