@@ -253,6 +253,38 @@ body.wp-admin a.vim-u {
 	color: var(--szm-midnight-text);
 }
 
+/* ---- Screen meta (Screen Options / Help toggle buttons + dropdown) ----
+   `#show-settings-link`/`#contextual-help-link` carry class "button", which
+   our generic `.wp-core-ui .button` rule already targets — but WP core's
+   own screen-meta stylesheet is enqueued after our theme CSS on some admin
+   screens, so at equal specificity core's later rule silently wins (same
+   enqueue-order issue already documented for .page-title-action above).
+   `!important` forces the win regardless of load order. `#screen-meta` is
+   the dropdown panel itself (Screen Options / Help content) — it renders
+   with an explicit white background independent of the toggle buttons, so
+   needs its own override; without it the panel's own light text (already
+   themed via the global `.wrap` color rule) becomes unreadable on white. */
+#screen-options-link-wrap .button,
+#contextual-help-link-wrap .button,
+#show-settings-link,
+#contextual-help-link {
+	background: var(--szm-midnight-surface-2) !important;
+	border-color: var(--szm-midnight-border-2) !important;
+	color: var(--szm-midnight-text) !important;
+}
+#screen-options-link-wrap .button:hover,
+#contextual-help-link-wrap .button:hover {
+	border-color: var(--szm-midnight-accent) !important;
+	color: var(--szm-midnight-heading) !important;
+}
+#screen-meta {
+	background: var(--szm-midnight-surface) !important;
+	border-color: var(--szm-midnight-border-2) !important;
+}
+#screen-meta a {
+	color: var(--szm-midnight-accent-2);
+}
+
 /* ---- Cards / widgets -------------------------------------------------- */
 .postbox,
 #dashboard-widgets .postbox,
@@ -481,6 +513,18 @@ body.login a:hover {
 .compat-item {
 	background: var(--szm-midnight-bg);
 	color: var(--szm-midnight-text);
+}
+/* `.media-toolbar` specifically loses to WP core's own media-views.css
+   despite equal selector specificity — that stylesheet is only enqueued
+   once `wp_enqueue_media()` runs, which lands it after our theme CSS in
+   source order on screens that open the modal dynamically (e.g. the
+   editor's Featured Image panel), so the later same-specificity rule wins
+   and the toolbar rendered as a plain white strip. `!important` forces the
+   win regardless of enqueue order — same tradeoff as .page-title-action
+   above. */
+.media-toolbar,
+.media-toolbar.wp-filter {
+	background: var(--szm-midnight-bg) !important;
 }
 .media-frame-title h1,
 .attachment-details .attachment-info,
