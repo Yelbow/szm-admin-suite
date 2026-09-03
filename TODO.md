@@ -83,6 +83,17 @@
 - [x] Gebruiker gaf direct tegengas op 1.0.5 ("full white" post-edit-scherm) — Gutenberg's eigen editor-chrome (toolbar, meta-box-wrapper, document-sidebar) bleek nooit aangepakt, ten onrechte als "buiten scope" bestempeld. Gefixt inclusief tweede-laags bug (donkere achtergrond legde zwarte Gutenberg-knoptekst bloot), Yoast's eigen postbox bewust licht gelaten. Versie 1.0.6, tag + release.
 - [x] Gebruiker gaf nogmaals tegengas: Yoast's keyphrase-invoerveld was donker (onze globale form-styling reikt overal in wp-admin) terwijl de rest van het Yoast-paneel licht bleef — inconsistent. Gebruiker gevraagd: volledig donker of volledig licht? Antwoord: consistent maken. Yoast's eigen inputs uitgesloten van onze donkere form-styling (`revert`) zodat het hele paneel weer licht-en-consistent oogt, i.p.v. het risico op Yoast's interne tekstkleuren overschrijven. Versie 1.0.7, tag + release.
 
+## Midnight Media Library/RML/meta boxes/form inputs (2026-09-02, `wp-admin-theming`-skill)
+- [x] Vier losse restfixes op Midnight (media library, RML-folder-paneel, meta-box-kaart, forminputs), elk geverifieerd via Playwright-render + `contrast-scan.js` over 11 pagina's. Versie 1.0.8, tag + release.
+
+## 7 screenshots-ronde 1 (2026-09-02, 15:53–15:58)
+- [x] 4 bugs gefixt over alle 4 thema's: ongevraagde plugin-notices (nieuwe Declutter-toggle, default aan), tab-hover/spacing, witte checkboxes. Versie 1.0.9, tag + release. Detail: DECISIONS.md 2026-09-02.
+
+## 7 screenshots-ronde 2, correctie (2026-09-02)
+- [x] Gebruiker corrigeerde de 1.0.9-melding ("elke screenshot had iets, en het is niet gefixt") — scope was afgeleid van een bullet-samenvatting i.p.v. de 7 screenshots stuk voor stuk. Opnieuw individueel doorlopen: 2 gemiste bugs gevonden en gefixt over alle 4 thema's (Screen Options/Help-knoppen+paneel, media-modal-toolbar), plus media-library-theming volledig geport naar Kawaii/Goth-Baddie/Cyberpunk (hadden 'm nooit, alleen Midnight). Versie 1.0.10, tag + release. Detail: DECISIONS.md 2026-09-02.
+- [ ] **Nog open, niet onderzocht:** de twee RML-galerij-screenshots (15:58:02, 15:58:26, licht paneel) — nog niet beoordeeld of dit een in-scope bug is of het galerij-plugin's eigen native styling (zoals eerder bij Yoast besloten).
+- [ ] ~373 vooraf bestaande, niet-vandaag-gerelateerde contrastfouten gevonden op de Admin Suite-instellingenpagina (module-koppen/labels, ratio's tot 1.11) — genoteerd in DECISIONS.md, bewust niet gefixt deze ronde, wacht op akkoord van de gebruiker voor een aparte sessie.
+
 ## Nog te doen / niet gepland
 - [ ] Menu-restrictie-module overnemen uit `szm-admin-menu-manager` (pas na v1 bewezen).
 - [ ] Bezoekers-statistieken (bewust uitgesteld, "No stats in v1").
