@@ -98,7 +98,7 @@
 - [x] Lijst uitgebreid: Yoast SEO, Duplicator, Sucuri Security, Duplicate Post, Twentig, Otter Blocks, LiteSpeed Cache (`inc/modules/dashboard/module.php`).
 - [x] Recommendatie-cards krijgen een duotone icon-tile: gradient-achtergrond + grijze icon (grayscale + multiply) + initial-letter fallback bij een kapot icoon; eigen `dashboard.css` wordt alleen op de dashboard-pagina geladen.
 - [x] Geverifieerd op mhh-testsite via Playwright (7 tiles, alle iconen geladen, filter/blend/background bevestigd via computed styles).
-- [x] Versie gebumpt naar 1.1.0. Nog niet getagd/gereleased.
+- [x] Versie gebumpt naar 1.1.0. Gecommit 2026-09-03 (`7747d1b` code, `237e4ff` docs) — nog niet getagd/gereleased, nog niet gepusht. Eerstvolgende stap: tag `v1.1.0` + release, daarna de open RML-galerij-vraag hierboven.
 - [ ] mhh-testsite: admin-password tijdelijk gewijzigd tijdens verificatie (doc-waarde werkte niet meer). Letterlijke waarde níet in de repo — staat in de lokale sessienotitie, zelfde plek als bij de eerdere wijziging hieronder.
 
 ## Nog te doen / niet gepland
