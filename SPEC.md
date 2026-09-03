@@ -20,3 +20,4 @@
 - Rollen: "roles we can better do some sort of selectt, from 'role' and up maybe something like that." → minimale-rol-select per module.
 - Thema's: "and give me cyberpunk and a kawaii theme already".
 - Thema's: "also make a goth baddie theme and be sure to check all themes for background color/text& icon color combinations becasue i see a lot of mistakes that are unreadable."
+- Plugin Recommendations: "i would like more plugin recommendations. and prefer with duotoned image in the plugin. yoast duplicate post, twentig, otter blocks, litespeed cache. no questions get it done"

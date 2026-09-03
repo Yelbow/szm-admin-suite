@@ -94,6 +94,13 @@
 - [ ] **Nog open, niet onderzocht:** de twee RML-galerij-screenshots (15:58:02, 15:58:26, licht paneel) — nog niet beoordeeld of dit een in-scope bug is of het galerij-plugin's eigen native styling (zoals eerder bij Yoast besloten).
 - [ ] ~373 vooraf bestaande, niet-vandaag-gerelateerde contrastfouten gevonden op de Admin Suite-instellingenpagina (module-koppen/labels, ratio's tot 1.11) — genoteerd in DECISIONS.md, bewust niet gefixt deze ronde, wacht op akkoord van de gebruiker voor een aparte sessie.
 
+## Plugin Recommendations uitbreiding + duotone icons (2026-09-03)
+- [x] Lijst uitgebreid: Yoast SEO, Duplicator, Sucuri Security, Duplicate Post, Twentig, Otter Blocks, LiteSpeed Cache (`inc/modules/dashboard/module.php`).
+- [x] Recommendatie-cards krijgen een duotone icon-tile: gradient-achtergrond + grijze icon (grayscale + multiply) + initial-letter fallback bij een kapot icoon; eigen `dashboard.css` wordt alleen op de dashboard-pagina geladen.
+- [x] Geverifieerd op mhh-testsite via Playwright (7 tiles, alle iconen geladen, filter/blend/background bevestigd via computed styles).
+- [x] Versie gebumpt naar 1.1.0. Nog niet getagd/gereleased.
+- [ ] mhh-testsite: admin-password tijdelijk gewijzigd tijdens verificatie (doc-waarde werkte niet meer). Letterlijke waarde níet in de repo — staat in de lokale sessienotitie, zelfde plek als bij de eerdere wijziging hieronder.
+
 ## Nog te doen / niet gepland
 - [ ] Menu-restrictie-module overnemen uit `szm-admin-menu-manager` (pas na v1 bewezen).
 - [ ] Bezoekers-statistieken (bewust uitgesteld, "No stats in v1").
