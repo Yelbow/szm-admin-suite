@@ -23,22 +23,47 @@ szm_as_register_module( array(
 ) );
 
 /**
- * Curated starter list of recommended plugins. Keyed by wordpress.org slug.
+ * Curated list of recommended plugins. Keyed by wordpress.org slug.
  * "Yoast Duplicator" maps to the popular "Duplicator" backup plugin.
+ * Each entry can carry an optional 'icon' (wordpress.org plugin icon) shown
+ * as a duotone tile in the dashboard widget.
  */
 function szm_as_dashboard_get_recommendations() {
 	return array(
 		'wordpress-seo' => array(
 			'name'        => __( 'Yoast SEO', 'szm-admin-suite' ),
 			'description' => __( 'Search engine optimization: titles, meta, sitemaps.', 'szm-admin-suite' ),
+			'icon'        => 'https://ps.w.org/wordpress-seo/assets/icon-128x128.gif',
 		),
 		'duplicator' => array(
 			'name'        => __( 'Duplicator', 'szm-admin-suite' ),
 			'description' => __( 'Backup and migration — copy or move the site safely.', 'szm-admin-suite' ),
+			'icon'        => 'https://ps.w.org/duplicator/assets/icon-128x128.png',
 		),
 		'sucuri-scanner' => array(
 			'name'        => __( 'Sucuri Security', 'szm-admin-suite' ),
 			'description' => __( 'Security auditing, malware scanning and hardening.', 'szm-admin-suite' ),
+			'icon'        => 'https://ps.w.org/sucuri-scanner/assets/icon-128x128.png',
+		),
+		'duplicate-post' => array(
+			'name'        => __( 'Duplicate Post', 'szm-admin-suite' ),
+			'description' => __( 'Clone posts, pages and custom post types in one click.', 'szm-admin-suite' ),
+			'icon'        => 'https://ps.w.org/duplicate-post/assets/icon-128x128.png',
+		),
+		'twentig' => array(
+			'name'        => __( 'Twentig', 'szm-admin-suite' ),
+			'description' => __( 'Extra options and blocks for the default Twenty themes: colors, spacing, patterns.', 'szm-admin-suite' ),
+			'icon'        => 'https://ps.w.org/twentig/assets/icon-128x128.png',
+		),
+		'otter-blocks' => array(
+			'name'        => __( 'Otter Blocks', 'szm-admin-suite' ),
+			'description' => __( 'Gutenberg page-building blocks: sections, animations, icons and more.', 'szm-admin-suite' ),
+			'icon'        => 'https://ps.w.org/otter-blocks/assets/icon-128x128.gif',
+		),
+		'litespeed-cache' => array(
+			'name'        => __( 'LiteSpeed Cache', 'szm-admin-suite' ),
+			'description' => __( 'All-in-one page cache, image optimization and site speed boost.', 'szm-admin-suite' ),
+			'icon'        => 'https://ps.w.org/litespeed-cache/assets/icon-128x128.png',
 		),
 	);
 }
@@ -48,8 +73,28 @@ function szm_as_dashboard_boot() {
 		return;
 	}
 
+	add_action( 'admin_enqueue_scripts', 'szm_as_dashboard_enqueue' );
 	add_action( 'wp_dashboard_setup', 'szm_as_dashboard_setup' );
 	add_action( 'wp_ajax_szm_as_plugin_action', 'szm_as_dashboard_ajax_plugin_action' );
+}
+
+/**
+ * Dashboard widget styling (recommendation cards + duotone icon tiles),
+ * only loaded on the dashboard screen.
+ */
+function szm_as_dashboard_enqueue() {
+	if ( 'index.php' !== ( isset( $GLOBALS['pagenow'] ) ? $GLOBALS['pagenow'] : '' ) ) {
+		return;
+	}
+	$css = SZM_AS_PATH . 'inc/modules/dashboard/dashboard.css';
+	if ( file_exists( $css ) ) {
+		wp_enqueue_style(
+			'szm-as-dashboard',
+			SZM_AS_URL . 'inc/modules/dashboard/dashboard.css',
+			array(),
+			(string) filemtime( $css )
+		);
+	}
 }
 
 /**
@@ -120,17 +165,29 @@ function szm_as_dashboard_render_recommendations() {
 	$nonce = wp_create_nonce( 'szm_as_plugin_action' );
 	echo '<ul style="margin:0; list-style:none;">';
 	foreach ( $recommendations as $slug => $rec ) {
-		$state = szm_as_dashboard_plugin_state( $slug );
-		echo '<li style="display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #e2e4e7;">';
-		echo '<div><strong>' . esc_html( $rec['name'] ) . '</strong><br><span class="description">' . esc_html( $rec['description'] ) . '</span></div>';
-		echo '<div>';
+		$state   = szm_as_dashboard_plugin_state( $slug );
+		$initial = mb_strtoupper( mb_substr( (string) $rec['name'], 0, 1 ) );
+		$icon    = isset( $rec['icon'] ) ? $rec['icon'] : '';
+
+		echo '<li class="szm-as-reco">';
+		echo '<span class="szm-as-reco-icon">';
+		echo '<span class="szm-as-reco-initial">' . esc_html( $initial ) . '</span>';
+		if ( $icon ) {
+			echo '<img src="' . esc_url( $icon ) . '" alt="" loading="lazy" />';
+		}
+		echo '</span>';
+		echo '<span class="szm-as-reco-body">';
+		echo '<strong class="szm-as-reco-name">' . esc_html( $rec['name'] ) . '</strong>';
+		echo '<span class="szm-as-reco-desc">' . esc_html( $rec['description'] ) . '</span>';
+		echo '</span>';
+		echo '<span class="szm-as-reco-action">';
 		if ( 'active' === $state['status'] ) {
 			echo '<span class="description">' . esc_html__( 'Active', 'szm-admin-suite' ) . '</span>';
 		} else {
 			$label = 'installed' === $state['status'] ? __( 'Activate', 'szm-admin-suite' ) : __( 'Install', 'szm-admin-suite' );
 			echo '<button type="button" class="button szm-as-plugin-action" data-slug="' . esc_attr( $slug ) . '" data-action="' . esc_attr( $state['status'] ) . '">' . esc_html( $label ) . '</button>';
 		}
-		echo '</div></li>';
+		echo '</span></li>';
 	}
 	echo '</ul>';
 	echo '<input type="hidden" id="szm-as-plugin-nonce" value="' . esc_attr( $nonce ) . '" />';
@@ -140,6 +197,11 @@ function szm_as_dashboard_render_recommendations() {
 	(function () {
 		var statusEl = document.getElementById( 'szm-as-plugin-status' );
 		var nonce    = document.getElementById( 'szm-as-plugin-nonce' ).value;
+
+		// Broken plugin icons fall back to the initial-letter tile.
+		[].forEach.call( document.querySelectorAll( '.szm-as-reco-icon img' ), function ( img ) {
+			img.addEventListener( 'error', function () { img.remove(); } );
+		} );
 
 		function onClick( e ) {
 			var btn = e.target.closest( '.szm-as-plugin-action' );

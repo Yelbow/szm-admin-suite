@@ -31,7 +31,7 @@ Manage everything under the top-level **Admin Suite** menu:
 
 ## Plugin Recommendations
 
-The dashboard's **Plugin Recommendations** card ships with a curated starter list (Yoast SEO, Duplicator, Sucuri Security). Each shows its state and offers one-click **Install / Activate** via admin-ajax, gated by nonce + `manage_options`. Installed plugins are skipped; the list is easily extended in `szm_as_dashboard_get_recommendations()`.
+The dashboard's **Plugin Recommendations** card ships with a curated starter list (Yoast SEO, Duplicator, Sucuri Security, Duplicate Post, Twentig, Otter Blocks, LiteSpeed Cache). Each plugin shows a duotone icon tile, its state, and a one-click **Install / Activate** via admin-ajax, gated by nonce + `manage_options`. Installed plugins are skipped; the list is easily extended in `szm_as_dashboard_get_recommendations()`.
 
 ## Adding an admin theme
 

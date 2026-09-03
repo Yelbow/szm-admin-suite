@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       SZM Admin Suite
  * Description:       One plugin, many modules — admin theme, custom dashboard, declutter and white-labeling — each toggleable on/off and configurable per role. Managed under the top-level "Admin Suite" menu.
- * Version:           1.0.10
+ * Version:           1.1.0
  * Requires at least: 5.9
  * Requires PHP:      7.4
  * Author:            Studio Zonder Meer
@@ -21,7 +21,7 @@ if ( defined( 'SZM_AS_LOADED' ) ) {
 }
 define( 'SZM_AS_LOADED', true );
 
-define( 'SZM_AS_VERSION', '1.0.10' );
+define( 'SZM_AS_VERSION', '1.1.0' );
 define( 'SZM_AS_OPTION', 'szm_as_settings' );
 define( 'SZM_AS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'SZM_AS_URL', plugin_dir_url( __FILE__ ) );
