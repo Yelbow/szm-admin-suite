@@ -13,9 +13,16 @@
  *
  * Also (optionally, default on): strips non-essential admin notices —
  * mainly the promo/upsell banners plugins print on their own initiative
- * ("X Pro is here", cross-sell CTAs) — before they render. Real errors, WP
- * core's own update/security nags, and this plugin's own notices are always
- * kept; see szm_as_declutter_keep_notice().
+ * ("X Pro is here", cross-sell CTAs) — before they render. Real errors and
+ * this plugin's own notices are always kept; see szm_as_declutter_keep_notice().
+ *
+ * WP core's own update/security/translation nags are kept ONLY on the
+ * Updates screen (update-core.php) itself — everywhere else (dashboard,
+ * every other admin page) they're suppressed like any other notice, so
+ * "there's an update" only surfaces where you'd actually go to act on it.
+ * The Plugins list table's own per-row "update available" banner isn't a
+ * notice at all (it doesn't run through admin_notices/all_admin_notices),
+ * so it's removed separately in szm_as_declutter_remove_plugin_update_rows().
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 szm_as_register_module( array(
 	'slug'            => 'declutter',
 	'name'            => __( 'Declutter', 'szm-admin-suite' ),
-	'description'     => __( 'Keeps new dashboard widgets (including ones added by newly installed plugins) unchecked in Screen Options by default, and strips non-essential plugin promo/upsell notices. Site Health, Welcome, Plugin Recommendations, real errors, and WP core\'s own update nags always stay visible.', 'szm-admin-suite' ),
+	'description'     => __( 'Keeps new dashboard widgets (including ones added by newly installed plugins) unchecked in Screen Options by default, and strips non-essential plugin promo/upsell notices and update nags. Site Health, Welcome, Plugin Recommendations, and real errors always stay visible; update nags only show on the Updates screen itself.', 'szm-admin-suite' ),
 	'icon'            => 'dashicons-visibility',
 	'default_enabled' => true,
 	'boot'            => 'szm_as_declutter_boot',
@@ -78,6 +85,28 @@ function szm_as_declutter_boot( $settings = array() ) {
 		add_action( $hook, 'szm_as_declutter_notice_buffer_start', -9999 );
 		add_action( $hook, 'szm_as_declutter_notice_buffer_end', PHP_INT_MAX );
 	}
+
+	// The Plugins list table's "There is an update available" row is
+	// rendered by wp_plugin_update_row(), hooked per-plugin-file onto
+	// after_plugin_row_{$file} from inside wp_plugin_update_rows() (itself
+	// hooked to load-plugins.php at priority 20). It never touches
+	// admin_notices, so the buffer above can't catch it — unhook the whole
+	// thing one priority earlier instead. It only ever runs on plugins.php,
+	// which is never the Updates screen, so this is safe unconditionally.
+	add_action( 'load-plugins.php', 'szm_as_declutter_remove_plugin_update_rows', 19 );
+}
+
+function szm_as_declutter_remove_plugin_update_rows() {
+	remove_action( 'load-plugins.php', 'wp_plugin_update_rows', 20 );
+}
+
+/**
+ * Whether we're currently on the Updates screen — the one place WP core's
+ * own update/security/translation nags are allowed to still show.
+ */
+function szm_as_declutter_is_updates_screen() {
+	global $pagenow;
+	return 'update-core.php' === $pagenow;
 }
 
 function szm_as_declutter_notice_buffer_start() {
@@ -155,14 +184,15 @@ function szm_as_declutter_keep_notice( $classes, $notice_html ) {
 	if ( preg_match( '/\b(error|notice-error)\b/', $classes ) ) {
 		return true;
 	}
-	// WP core's own update/security/translation nags.
-	if ( preg_match( '/\b(update-nag|update-message|translation-nag|plugin-update-tr)\b/', $classes ) ) {
-		return true;
-	}
-	// This plugin's own notices, and anything from WordPress core update
-	// checks specifically (identifiable by their own markup, not just class).
+	// This plugin's own notices, identifiable by their own markup.
 	if ( false !== strpos( $notice_html, 'szm-as-' ) || false !== strpos( $notice_html, 'szm_as_' ) ) {
 		return true;
+	}
+	// WP core's own update/security/translation nags: only worth keeping on
+	// the Updates screen itself — anywhere else they're the exact kind of
+	// "there's a badge somewhere, go find it" noise this module exists to cut.
+	if ( preg_match( '/\b(update-nag|update-message|translation-nag|plugin-update-tr)\b/', $classes ) ) {
+		return szm_as_declutter_is_updates_screen();
 	}
 	return false;
 }
@@ -257,7 +287,7 @@ function szm_as_declutter_render( $settings ) {
 			<?php checked( $suppress ); ?> />
 		<?php esc_html_e( 'Hide non-essential plugin notices (promo/upsell banners) admin-wide', 'szm-admin-suite' ); ?>
 	</label>
-	<p class="description"><?php esc_html_e( 'Real errors and WordPress\'s own update/security notices always stay visible — this only strips banners plugins print on their own initiative (e.g. "X Pro is here").', 'szm-admin-suite' ); ?></p>
+	<p class="description"><?php esc_html_e( 'Real errors always stay visible. Promo/upsell banners plugins print on their own initiative (e.g. "X Pro is here") get stripped everywhere. WordPress\'s own update/security nags, and the Plugins list\'s "update available" row, are also hidden outside the Updates screen — so they only show up where you\'d actually go to act on them.', 'szm-admin-suite' ); ?></p>
 
 	<h3><?php esc_html_e( 'Dashboard widgets', 'szm-admin-suite' ); ?></h3>
 	<p><?php esc_html_e( 'Every dashboard widget not ticked here starts unchecked in each user\'s Screen Options — including new ones added later by a freshly installed plugin. Users can still tick any widget back on for themselves; we never override a choice they\'ve already made. Site Health always stays visible.', 'szm-admin-suite' ); ?></p>
