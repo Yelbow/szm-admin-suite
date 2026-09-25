@@ -297,8 +297,9 @@ function szm_as_dashboard_render_recommendations() {
 		if ( 'active' === $state['status'] ) {
 			echo '<span class="description">' . esc_html__( 'Active', 'szm-admin-suite' ) . '</span>';
 		} else {
+			$todo  = 'installed' === $state['status'] ? 'activate' : 'install';
 			$label = 'installed' === $state['status'] ? __( 'Activate', 'szm-admin-suite' ) : __( 'Install', 'szm-admin-suite' );
-			echo '<button type="button" class="button szm-as-plugin-action" data-slug="' . esc_attr( $slug ) . '" data-action="' . esc_attr( $state['status'] ) . '">' . esc_html( $label ) . '</button>';
+			echo '<button type="button" class="button szm-as-plugin-action" data-slug="' . esc_attr( $slug ) . '" data-action="' . esc_attr( $todo ) . '">' . esc_html( $label ) . '</button>';
 		}
 		echo '</span></li>';
 	}
