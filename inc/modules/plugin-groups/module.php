@@ -3,29 +3,128 @@
  * Module: Plugin Groups.
  *
  * Splits the Plugins list table into extra tabs (alongside core's own
- * All/Active/Inactive/...), one per group. Groups are not hardcoded in
- * code — they're defined on the module's settings tab: type a group name
- * per line, then pick a group per installed plugin from a dropdown. A
- * plugin newly installed later just shows up in that dropdown as
- * "Ungrouped"; nothing here needs a code change to stay in sync with what's
- * actually on the site.
+ * All/Active/Inactive/...), one per group. Groups aren't hardcoded in
+ * code — they live on the module's settings tab: a group name per line,
+ * plus a dropdown per installed plugin to assign it. Editable per site,
+ * and a plugin installed later just shows up as "Ungrouped" until
+ * assigned; nothing here needs a code change to stay in sync with what's
+ * actually installed.
+ *
+ * The settings below are only the STARTING values (first activation on a
+ * site with no saved settings yet) — the same categories/plugin slugs from
+ * the original SZM house snippet this module replaced, so a freshly
+ * enabled site looks pre-organized instead of empty. From then on the
+ * settings tab, not this file, is the source of truth: renaming a group,
+ * adding one, or reassigning a plugin here has zero effect once a site has
+ * saved settings of its own.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Starting group_labels/assignments — see the file docblock above. Slugs
+ * are computed from the labels via szm_as_plugin_groups_get_groups() (the
+ * same function the rest of this module uses) so they're always in sync
+ * with however that function slugifies things, instead of a second
+ * hand-maintained slug list that could drift out of step with it.
+ */
+function szm_as_plugin_groups_seed_settings() {
+	$labels = array(
+		'systeem'   => __( 'Systeem & Dev', 'szm-admin-suite' ),
+		'core'      => __( 'Core Verbeteringen', 'szm-admin-suite' ),
+		'webshop'   => __( 'Webshop', 'szm-admin-suite' ),
+		'producten' => __( 'Productbeheer', 'szm-admin-suite' ),
+		'marketing' => __( 'Marketing & SEO', 'szm-admin-suite' ),
+		'opti'      => __( 'Optimalisatie', 'szm-admin-suite' ),
+		'content'   => __( 'Inhoud & Taal', 'szm-admin-suite' ),
+	);
+	$plugins_by_label = array(
+		'Systeem & Dev'      => array(
+			'advanced-custom-fields/acf.php',
+			'code-snippets/code-snippets.php',
+			'all-in-one-wp-migration/all-in-one-wp-migration.php',
+			'wpvivid-backuprestore/wpvivid-backuprestore.php',
+			'wp-migrate-db/wp-migrate-db.php',
+			'query-monitor/query-monitor.php',
+			'wp-hooks-finder/wp-hooks-finder.php',
+		),
+		'Core Verbeteringen' => array(
+			'enable-media-replace/enable-media-replace.php',
+			'wp-rollback/wp-rollback.php',
+			'duplicate-post/duplicate-post.php',
+			'simple-local-avatars/simple-local-avatars.php',
+			'imsanity/imsanity.php',
+		),
+		'Webshop'            => array(
+			'woocommerce/woocommerce.php',
+			'woocommerce-payments/woocommerce-payments.php',
+			'woo-permalink-manager/premmerce-url-manager.php',
+		),
+		'Productbeheer'      => array(
+			'advanced-dynamic-pricing-for-woocommerce/advanced-dynamic-pricing-for-woocommerce.php',
+			'bulky-bulk-edit-products-for-woo/bulky-bulk-edit-products-for-woo.php',
+			'filter-everything/filter-everything.php',
+			'woo-product-variation-gallery/woo-product-variation-gallery.php',
+			'variation-swatches-woo/variation-swatches-woo.php',
+			'print-invoices-packing-slip-labels-for-woocommerce/print-invoices-packing-slip-labels-for-woocommerce.php',
+			'webappick-product-feed-for-woocommerce/woo-feed.php',
+			'woo-preview-emails/woocommerce-preview-emails.php',
+		),
+		'Marketing & SEO'    => array(
+			'eps-301-redirects/eps-301-redirects.php',
+			'advanced-google-recaptcha/advanced-google-recaptcha.php',
+			'woocommerce-google-analytics-integration/woocommerce-google-analytics-integration.php',
+			'duracelltomi-google-tag-manager/duracelltomi-google-tag-manager-for-wordpress.php',
+			'microsoft-clarity/clarity.php',
+			'wordpress-seo/wp-seo.php',
+		),
+		'Optimalisatie'      => array(
+			'webp-converter-for-media/webp-converter-for-media.php',
+			'litespeed-cache/litespeed-cache.php',
+		),
+		'Inhoud & Taal'      => array(
+			'loco-translate/loco.php',
+			'polylang/polylang.php',
+			'polylang-wc/polylang-wc.php',
+			'wp-menu-icons/wp-menu-icons.php',
+			'block-options/plugin.php',
+			'font-awesome/index.php',
+		),
+	);
+
+	$group_labels = implode( "\n", $labels );
+
+	// Slugify the same way szm_as_plugin_groups_get_groups() will, so the
+	// assignments below use slugs that actually resolve once this becomes
+	// the saved settings.
+	$slug_by_label = array_flip( szm_as_plugin_groups_get_groups( array( 'group_labels' => $group_labels ) ) );
+
+	$assignments = array();
+	foreach ( $plugins_by_label as $label => $plugin_files ) {
+		if ( ! isset( $slug_by_label[ $label ] ) ) {
+			continue;
+		}
+		foreach ( $plugin_files as $plugin_file ) {
+			$assignments[ $plugin_file ] = $slug_by_label[ $label ];
+		}
+	}
+
+	return array(
+		'group_labels' => $group_labels,
+		'assignments'  => $assignments,
+	);
+}
+
 szm_as_register_module( array(
 	'slug'            => 'plugin-groups',
 	'name'            => __( 'Plugin Groups', 'szm-admin-suite' ),
-	'description'     => __( 'Adds extra tabs to the Plugins screen (Systeem, Webshop, Marketing, ...) so a long plugin list stays organized. Groups and plugin assignments are configured here, not hardcoded.', 'szm-admin-suite' ),
+	'description'     => __( 'Adds extra tabs to the Plugins screen (Systeem, Webshop, Marketing, ...) so a long plugin list stays organized. Starts pre-filled with SZM\'s own house categories; groups and plugin assignments are edited on this tab, not hardcoded.', 'szm-admin-suite' ),
 	'icon'            => 'dashicons-category',
 	'default_enabled' => false,
 	'boot'            => 'szm_as_plugin_groups_boot',
-	'settings'        => array(
-		'group_labels' => '',
-		'assignments'  => array(),
-	),
+	'settings'        => szm_as_plugin_groups_seed_settings(),
 	'tab_title'       => __( 'Plugin Groups', 'szm-admin-suite' ),
 	'render'          => 'szm_as_plugin_groups_render',
 	'sanitize'        => 'szm_as_plugin_groups_sanitize',
