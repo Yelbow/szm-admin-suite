@@ -21,3 +21,8 @@
 - Thema's: "and give me cyberpunk and a kawaii theme already".
 - Thema's: "also make a goth baddie theme and be sure to check all themes for background color/text& icon color combinations becasue i see a lot of mistakes that are unreadable."
 - Plugin Recommendations: "i would like more plugin recommendations. and prefer with duotoned image in the plugin. yoast duplicate post, twentig, otter blocks, litespeed cache. no questions get it done"
+- Nieuwe module Plugin Groups, 2026-09-25: gebruiker leverde een werkende functions.php-snippet aan (hardcoded `get_my_plugin_groups()`-array + tabs op het Plugins-scherm) met de vraag: "i also want this in de admin suite: [snippet] ... but less hardcoded more automaticallly organized."
+- "i expected the groups already set like i had in the plugin and all my existing plugins already ordered" — de module moet bij eerste activatie al gevuld zijn met de eigen categorieën/plugins van de gebruiker, niet leeg.
+- "enable by default" — de Plugin Groups module moet standaard aan staan.
+- Declutter-notices, 2026-09-25: "also every dumb plguin notification ever in the future needs to be hidden via this plugin super annoying."
+- Declutter-notices, 2026-09-25: "yeah suppress the update nags too i only want those to show up on the updates page. not anywhere lese" (= not anywhere else).

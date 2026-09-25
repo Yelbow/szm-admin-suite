@@ -101,6 +101,17 @@
 - [x] Versie gebumpt naar 1.1.0. Tag `v1.1.0` + GitHub release gepubliceerd (PUC self-update naar 1.1.0).
 - [ ] mhh-testsite: admin-password tijdelijk gewijzigd tijdens verificatie (doc-waarde werkte niet meer). Letterlijke waarde níet in de repo — staat in de lokale sessienotitie, zelfde plek als bij de eerdere wijziging hieronder.
 
+## Plugin Groups module (2026-09-25)
+- [x] Nieuwe module toegevoegd (`inc/modules/plugin-groups/module.php`): extra tabs op het Plugins-scherm per groep, gebaseerd op de door de gebruiker aangeleverde snippet maar settings-gedreven i.p.v. hardcoded — groepen + plugin-toewijzingen op een eigen instellingen-tab. Versie 1.3.0, tag + release.
+- [x] Correctie: standaardwaarden alsnog gevuld met de 7 categorieën + 37 plugin-toewijzingen uit de aangeleverde snippet (startwaarde bij eerste activatie, blijft volledig instelbaar). Versie 1.3.1, tag + release.
+- [x] Correctie: module staat nu standaard aan (`default_enabled: true`). Versie 1.3.2, tag + release. Detail: DECISIONS.md 2026-09-25.
+- [ ] mhh-testsite: nog steeds op plugin-versie 1.1.0 geïnstalleerd; alleen `inc/modules/plugin-groups/module.php` is handmatig in de draaiende container gekopieerd voor verificatie (zie [[szm-admin-suite-testsite]]) — niet via de normale PUC-update. Site staat dus buiten sync met git tot er een echte update op die site wordt uitgevoerd.
+
+## Declutter: update-nags naar Updates-scherm (2026-09-25)
+- [x] Update-nags (WP core update/security/translation-nag + Plugins-lijst "update available"-rij) blijven nu alleen zichtbaar op het Updates-scherm (`update-core.php`), overal elders onderdrukt net als andere notices. `plugin-update-tr`-rij loopt niet via `admin_notices`, dus apart opgelost door `wp_plugin_update_rows` te unhooken op `load-plugins.php`. Zie `inc/modules/declutter/module.php`.
+- [x] Geverifieerd op fse-test (echte ingelogde fetch): geen update-nag op dashboard, geen update-rij bij novamira/woocommerce op de Plugins-pagina, nag blijft wél zichtbaar op update-core.php.
+- [x] Versie gebumpt en getagd — bleek al gebeurd toen ernaar gevraagd werd: een parallelle sessie was tegelijk aan de Plugin Groups-module (zie hierboven) aan het werk en had de versie net naar 1.3.0 gebumpt/getagd op precies deze fixcommit. Inmiddels door dat andere werk verder opgehoogd naar 1.3.2.
+
 ## Nog te doen / niet gepland
 - [ ] Menu-restrictie-module overnemen uit `szm-admin-menu-manager` (pas na v1 bewezen).
 - [ ] Bezoekers-statistieken (bewust uitgesteld, "No stats in v1").
