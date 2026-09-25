@@ -122,7 +122,7 @@ szm_as_register_module( array(
 	'name'            => __( 'Plugin Groups', 'szm-admin-suite' ),
 	'description'     => __( 'Adds extra tabs to the Plugins screen (Systeem, Webshop, Marketing, ...) so a long plugin list stays organized. Starts pre-filled with SZM\'s own house categories; groups and plugin assignments are edited on this tab, not hardcoded.', 'szm-admin-suite' ),
 	'icon'            => 'dashicons-category',
-	'default_enabled' => false,
+	'default_enabled' => true,
 	'boot'            => 'szm_as_plugin_groups_boot',
 	'settings'        => szm_as_plugin_groups_seed_settings(),
 	'tab_title'       => __( 'Plugin Groups', 'szm-admin-suite' ),
