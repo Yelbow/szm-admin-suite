@@ -17,7 +17,7 @@
 	height: 46px;
 	border-radius: 10px;
 	overflow: hidden;
-	background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+	background: #06b6d4;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
 .szm-as-reco-initial {
@@ -55,6 +55,12 @@
 	font-size: 12px;
 	line-height: 1.4;
 	opacity: 0.85;
+}
+.szm-as-reco-installs {
+	font-size: 11px;
+	line-height: 1.4;
+	color: #06b6d4;
+	font-weight: 600;
 }
 .szm-as-reco-action {
 	flex: 0 0 auto;

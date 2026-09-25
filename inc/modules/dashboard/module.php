@@ -29,43 +29,148 @@ szm_as_register_module( array(
  * as a duotone tile in the dashboard widget.
  */
 function szm_as_dashboard_get_recommendations() {
+	return array_merge(
+		array(
+			'wordpress-seo' => array(
+				'source'      => 'wporg',
+				'name'        => __( 'Yoast SEO', 'szm-admin-suite' ),
+				'description' => __( 'Search engine optimization: titles, meta, sitemaps.', 'szm-admin-suite' ),
+				'icon'        => 'https://ps.w.org/wordpress-seo/assets/icon-128x128.gif',
+			),
+			'duplicator' => array(
+				'source'      => 'wporg',
+				'name'        => __( 'Duplicator', 'szm-admin-suite' ),
+				'description' => __( 'Backup and migration — copy or move the site safely.', 'szm-admin-suite' ),
+				'icon'        => 'https://ps.w.org/duplicator/assets/icon-128x128.png',
+			),
+			'sucuri-scanner' => array(
+				'source'      => 'wporg',
+				'name'        => __( 'Sucuri Security', 'szm-admin-suite' ),
+				'description' => __( 'Security auditing, malware scanning and hardening.', 'szm-admin-suite' ),
+				'icon'        => 'https://ps.w.org/sucuri-scanner/assets/icon-128x128.png',
+			),
+			'duplicate-post' => array(
+				'source'      => 'wporg',
+				'name'        => __( 'Duplicate Post', 'szm-admin-suite' ),
+				'description' => __( 'Clone posts, pages and custom post types in one click.', 'szm-admin-suite' ),
+				'icon'        => 'https://ps.w.org/duplicate-post/assets/icon-128x128.png',
+			),
+			'twentig' => array(
+				'source'      => 'wporg',
+				'name'        => __( 'Twentig', 'szm-admin-suite' ),
+				'description' => __( 'Extra options and blocks for the default Twenty themes: colors, spacing, patterns.', 'szm-admin-suite' ),
+				'icon'        => 'https://ps.w.org/twentig/assets/icon-128x128.png',
+			),
+			'otter-blocks' => array(
+				'source'      => 'wporg',
+				'name'        => __( 'Otter Blocks', 'szm-admin-suite' ),
+				'description' => __( 'Gutenberg page-building blocks: sections, animations, icons and more.', 'szm-admin-suite' ),
+				'icon'        => 'https://ps.w.org/otter-blocks/assets/icon-128x128.gif',
+			),
+			'litespeed-cache' => array(
+				'source'      => 'wporg',
+				'name'        => __( 'LiteSpeed Cache', 'szm-admin-suite' ),
+				'description' => __( 'All-in-one page cache, image optimization and site speed boost.', 'szm-admin-suite' ),
+				'icon'        => 'https://ps.w.org/litespeed-cache/assets/icon-128x128.png',
+			),
+		),
+		szm_as_dashboard_get_own_plugins()
+	);
+}
+
+/**
+ * Studio Zonder Meer's own plugins, installed straight from their GitHub
+ * release zips (they aren't on wordpress.org, so there's no listing to pull
+ * an icon or install-count from).
+ */
+function szm_as_dashboard_get_own_plugins() {
 	return array(
-		'wordpress-seo' => array(
-			'name'        => __( 'Yoast SEO', 'szm-admin-suite' ),
-			'description' => __( 'Search engine optimization: titles, meta, sitemaps.', 'szm-admin-suite' ),
-			'icon'        => 'https://ps.w.org/wordpress-seo/assets/icon-128x128.gif',
+		'szm-admin-menu-manager' => array(
+			'source'      => 'github',
+			'repo'        => 'Yelbow/szm-admin-menu-manager',
+			'version'     => '2.4.1',
+			'name'        => __( 'SZM Admin Menu Manager', 'szm-admin-suite' ),
+			'description' => __( 'Reorder, rename and hide wp-admin menu items per role.', 'szm-admin-suite' ),
 		),
-		'duplicator' => array(
-			'name'        => __( 'Duplicator', 'szm-admin-suite' ),
-			'description' => __( 'Backup and migration — copy or move the site safely.', 'szm-admin-suite' ),
-			'icon'        => 'https://ps.w.org/duplicator/assets/icon-128x128.png',
+		'szm-hover-animations' => array(
+			'source'      => 'github',
+			'repo'        => 'Yelbow/szm-hover-animations',
+			'version'     => '1.14.0',
+			'name'        => __( 'SZM Hover Animations', 'szm-admin-suite' ),
+			'description' => __( 'Hover- and entrance animations for Group, Cover and Column blocks in the site editor.', 'szm-admin-suite' ),
 		),
-		'sucuri-scanner' => array(
-			'name'        => __( 'Sucuri Security', 'szm-admin-suite' ),
-			'description' => __( 'Security auditing, malware scanning and hardening.', 'szm-admin-suite' ),
-			'icon'        => 'https://ps.w.org/sucuri-scanner/assets/icon-128x128.png',
+		'szm-voorraadoverzicht' => array(
+			'source'      => 'github',
+			'repo'        => 'Yelbow/szm-voorraadoverzicht',
+			'version'     => '1.0.1',
+			'name'        => __( 'SZM Voorraadoverzicht', 'szm-admin-suite' ),
+			'description' => __( 'Stock overview dashboard for WooCommerce products.', 'szm-admin-suite' ),
 		),
-		'duplicate-post' => array(
-			'name'        => __( 'Duplicate Post', 'szm-admin-suite' ),
-			'description' => __( 'Clone posts, pages and custom post types in one click.', 'szm-admin-suite' ),
-			'icon'        => 'https://ps.w.org/duplicate-post/assets/icon-128x128.png',
+		'szm-absolute-positioning' => array(
+			'source'      => 'github',
+			'repo'        => 'Yelbow/szm-absolute-positioning',
+			'version'     => '0.1.0',
+			'name'        => __( 'SZM Absolute Positioning', 'szm-admin-suite' ),
+			'description' => __( 'Framer-style absolute positioning of blocks in the site editor.', 'szm-admin-suite' ),
 		),
-		'twentig' => array(
-			'name'        => __( 'Twentig', 'szm-admin-suite' ),
-			'description' => __( 'Extra options and blocks for the default Twenty themes: colors, spacing, patterns.', 'szm-admin-suite' ),
-			'icon'        => 'https://ps.w.org/twentig/assets/icon-128x128.png',
-		),
-		'otter-blocks' => array(
-			'name'        => __( 'Otter Blocks', 'szm-admin-suite' ),
-			'description' => __( 'Gutenberg page-building blocks: sections, animations, icons and more.', 'szm-admin-suite' ),
-			'icon'        => 'https://ps.w.org/otter-blocks/assets/icon-128x128.gif',
-		),
-		'litespeed-cache' => array(
-			'name'        => __( 'LiteSpeed Cache', 'szm-admin-suite' ),
-			'description' => __( 'All-in-one page cache, image optimization and site speed boost.', 'szm-admin-suite' ),
-			'icon'        => 'https://ps.w.org/litespeed-cache/assets/icon-128x128.png',
+		'reusable-gutenberg-block-styles' => array(
+			'source'      => 'github',
+			'repo'        => 'Yelbow/reusable-gutenberg-block-styles',
+			'version'     => '1.0.0',
+			'name'        => __( 'Reusable Gutenberg Block Styles', 'szm-admin-suite' ),
+			'description' => __( 'Custom block styles shared across every site, defined once in Git.', 'szm-admin-suite' ),
 		),
 	);
+}
+
+/**
+ * Fetch a plugin's active-install count from wordpress.org, cached in a
+ * transient for a day. Returns null if it can't be determined (offline,
+ * API error, unknown slug) so the caller can just skip the line.
+ */
+function szm_as_dashboard_get_active_installs( $slug ) {
+	$transient_key = 'szm_as_installs_' . $slug;
+	$cached        = get_transient( $transient_key );
+	if ( false !== $cached ) {
+		return '' === $cached ? null : (int) $cached;
+	}
+
+	require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+
+	$api = plugins_api( 'plugin_information', array(
+		'slug'   => $slug,
+		'fields' => array(
+			'sections'           => false,
+			'short_description'  => false,
+			'description'        => false,
+			'downloadlink'       => false,
+			'active_installs'    => true,
+		),
+	) );
+
+	if ( is_wp_error( $api ) || ! isset( $api->active_installs ) ) {
+		// Cache the miss too, so a broken/offline check doesn't hit the API every load.
+		set_transient( $transient_key, '', HOUR_IN_SECONDS );
+		return null;
+	}
+
+	$installs = (int) $api->active_installs;
+	set_transient( $transient_key, $installs, DAY_IN_SECONDS );
+
+	return $installs;
+}
+
+/**
+ * Format an install count the way wordpress.org does: "500,000+", "1+".
+ */
+function szm_as_dashboard_format_installs( $installs ) {
+	$steps = array( 1000000, 500000, 100000, 50000, 10000, 5000, 1000, 500, 100, 50, 10, 5, 1 );
+	foreach ( $steps as $step ) {
+		if ( $installs >= $step ) {
+			return number_format_i18n( $step ) . '+';
+		}
+	}
+	return number_format_i18n( 0 ) . '+';
 }
 
 function szm_as_dashboard_boot() {
@@ -168,6 +273,7 @@ function szm_as_dashboard_render_recommendations() {
 		$state   = szm_as_dashboard_plugin_state( $slug );
 		$initial = mb_strtoupper( mb_substr( (string) $rec['name'], 0, 1 ) );
 		$icon    = isset( $rec['icon'] ) ? $rec['icon'] : '';
+		$installs = ( 'github' === ( $rec['source'] ?? 'wporg' ) ) ? null : szm_as_dashboard_get_active_installs( $slug );
 
 		echo '<li class="szm-as-reco">';
 		echo '<span class="szm-as-reco-icon">';
@@ -179,6 +285,13 @@ function szm_as_dashboard_render_recommendations() {
 		echo '<span class="szm-as-reco-body">';
 		echo '<strong class="szm-as-reco-name">' . esc_html( $rec['name'] ) . '</strong>';
 		echo '<span class="szm-as-reco-desc">' . esc_html( $rec['description'] ) . '</span>';
+		if ( null !== $installs ) {
+			/* translators: %s: formatted active install count, e.g. "500,000+". */
+			echo '<span class="szm-as-reco-installs">' . esc_html( sprintf( __( '%s active installs', 'szm-admin-suite' ), szm_as_dashboard_format_installs( $installs ) ) ) . '</span>';
+		} elseif ( 'github' === ( $rec['source'] ?? 'wporg' ) ) {
+			/* translators: %s: version number, e.g. "1.14.0". */
+			echo '<span class="szm-as-reco-installs">' . esc_html( sprintf( __( 'Our plugin · v%s', 'szm-admin-suite' ), $rec['version'] ) ) . '</span>';
+		}
 		echo '</span>';
 		echo '<span class="szm-as-reco-action">';
 		if ( 'active' === $state['status'] ) {
@@ -285,13 +398,89 @@ function szm_as_dashboard_ajax_plugin_action() {
 		wp_send_json_error( __( 'Unknown plugin.', 'szm-admin-suite' ) );
 	}
 
+	$rec = $recs[ $slug ];
+
 	if ( 'install' === $todo ) {
-		szm_as_dashboard_install_plugin( $slug );
+		if ( 'github' === ( $rec['source'] ?? 'wporg' ) ) {
+			szm_as_dashboard_install_github_plugin( $slug, $rec['repo'], $rec['version'] );
+		} else {
+			szm_as_dashboard_install_plugin( $slug );
+		}
 	} elseif ( 'activate' === $todo ) {
 		szm_as_dashboard_activate_plugin( $slug );
 	} else {
 		wp_send_json_error( __( 'Invalid action.', 'szm-admin-suite' ) );
 	}
+}
+
+/**
+ * Install one of our own plugins straight from its GitHub release zip.
+ * GitHub's tag-archive zip extracts to "<repo>-<version>/"; renamed to
+ * "<slug>/" via 'upgrader_source_selection' so it lines up with what
+ * szm_as_dashboard_plugin_file() expects, same as a wordpress.org install.
+ */
+function szm_as_dashboard_install_github_plugin( $slug, $repo, $version ) {
+	require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+	require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+	require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+
+	$download_url = "https://github.com/{$repo}/archive/refs/tags/v{$version}.zip";
+
+	$rename = function ( $source, $remote_source, $upgrader, $args ) use ( $slug ) {
+		return szm_as_dashboard_rename_source( $source, $slug );
+	};
+	add_filter( 'upgrader_source_selection', $rename, 10, 4 );
+
+	$skin     = new Plugin_Installer_Skin( array( 'nonce' => 'install-plugin_' . $slug ) );
+	$upgrader = new Plugin_Upgrader( $skin );
+	$result   = $upgrader->install( $download_url );
+
+	remove_filter( 'upgrader_source_selection', $rename, 10 );
+
+	if ( is_wp_error( $result ) ) {
+		wp_send_json_error( $result->get_error_message() );
+	}
+	if ( true !== $result ) {
+		wp_send_json_error( __( 'Installation failed.', 'szm-admin-suite' ) );
+	}
+
+	$file = szm_as_dashboard_plugin_file( $slug );
+	if ( $file && ! is_plugin_active( $file ) ) {
+		$activated = activate_plugin( $file );
+		if ( is_wp_error( $activated ) ) {
+			wp_send_json_success( array(
+				'message' => __( 'Installed, but activation failed:', 'szm-admin-suite' ) . ' ' . $activated->get_error_message(),
+				'after'   => __( 'Installed', 'szm-admin-suite' ),
+			) );
+		}
+	}
+	wp_send_json_success( array(
+		'message' => __( 'Installed and activated.', 'szm-admin-suite' ),
+		'after'   => __( 'Active', 'szm-admin-suite' ),
+	) );
+}
+
+/**
+ * Rename the just-extracted plugin folder to the expected slug.
+ */
+function szm_as_dashboard_rename_source( $source, $slug ) {
+	global $wp_filesystem;
+
+	if ( ! $wp_filesystem || ! is_dir( $source ) ) {
+		return $source;
+	}
+
+	$new_source = trailingslashit( dirname( $source ) ) . $slug . '/';
+	if ( untrailingslashit( $source ) === untrailingslashit( $new_source ) ) {
+		return $source;
+	}
+
+	if ( $wp_filesystem->move( $source, $new_source, true ) ) {
+		return $new_source;
+	}
+
+	return $source;
 }
 
 function szm_as_dashboard_install_plugin( $slug ) {
