@@ -433,7 +433,7 @@ function szm_as_dashboard_install_github_plugin( $slug, $repo, $version ) {
 	};
 	add_filter( 'upgrader_source_selection', $rename, 10, 4 );
 
-	$skin     = new Plugin_Installer_Skin( array( 'nonce' => 'install-plugin_' . $slug ) );
+	$skin     = new Automatic_Upgrader_Skin();
 	$upgrader = new Plugin_Upgrader( $skin );
 	$result   = $upgrader->install( $download_url );
 
@@ -499,7 +499,7 @@ function szm_as_dashboard_install_plugin( $slug ) {
 		wp_send_json_error( $api->get_error_message() );
 	}
 
-	$skin     = new Plugin_Installer_Skin( array( 'nonce' => 'install-plugin_' . $slug ) );
+	$skin     = new Automatic_Upgrader_Skin();
 	$upgrader = new Plugin_Upgrader( $skin );
 	$result   = $upgrader->install( $api->download_link );
 
