@@ -150,7 +150,10 @@ final class SZM_Admin_Suite {
 			// Only recurse into a non-empty array override. An empty array is
 			// a real value (e.g. declutter's always_show = "show nothing extra")
 			// and must replace the default instead of silently keeping it.
-			if ( isset( $defaults[ $key ] ) && is_array( $defaults[ $key ] ) && is_array( $value ) && ! empty( $value ) ) {
+			// A list (indexed array, e.g. always_show) is replaced as a whole:
+			// merging it per index would keep trailing default items.
+			$is_list = is_array( $value ) && array_keys( $value ) === range( 0, count( $value ) - 1 );
+			if ( isset( $defaults[ $key ] ) && is_array( $defaults[ $key ] ) && is_array( $value ) && ! empty( $value ) && ! $is_list ) {
 				$defaults[ $key ] = $this->deep_merge( $defaults[ $key ], $value );
 			} else {
 				$defaults[ $key ] = $value;
