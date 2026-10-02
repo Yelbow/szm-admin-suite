@@ -15,6 +15,7 @@
 | Declutter | `declutter` | Verbergt default dashboard-widgets / rommel. | AAN |
 | White-label | `white-label` | Eigen logo, footer-tekst, login-achtergrond. | UIT (geen logo ingesteld) |
 | Plugin Groups | `plugin-groups` | Extra tabs op het Plugins-scherm per groep; groepen + toewijzingen instelbaar op de module's eigen tab (settings-gedreven, niet hardcoded). Start pre-filled met SZM's eigen categorieën. | AAN |
+| Post Type Labels | `post-type-labels` | Hernoemt een post type in de admin (bv. Berichten -> Verhalen) uit settings: enkelvoud/meervoud per type + bewerkbare label-templates. Defaults staan als data in `defaults.php` (VJL-waarden). | UIT |
 
 - Menu-restrictie-module: **niet in v1**. Komt later over uit `szm-admin-menu-manager` zodra v1 bewezen is.
 - Bezoekers-statistieken: **niet in v1** (afgesproken "No stats in v1").
