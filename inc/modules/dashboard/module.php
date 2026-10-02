@@ -99,12 +99,17 @@ function szm_as_dashboard_get_own_plugins() {
 			'name'        => __( 'SZM Hover Animations', 'szm-admin-suite' ),
 			'description' => __( 'Hover- and entrance animations for Group, Cover and Column blocks in the site editor.', 'szm-admin-suite' ),
 		),
-		'szm-voorraadoverzicht' => array(
+		'szm-woo-suite' => array(
 			'source'      => 'github',
-			'repo'        => 'Yelbow/szm-voorraadoverzicht',
-			'version'     => '1.0.1',
-			'name'        => __( 'SZM Voorraadoverzicht', 'szm-admin-suite' ),
-			'description' => __( 'Stock overview dashboard for WooCommerce products.', 'szm-admin-suite' ),
+			// Plugin renamed from szm-voorraadoverzicht (2026-10-02). The GitHub
+			// repo is not renamed yet: switch to 'Yelbow/szm-woo-suite' once it is,
+			// and bump 'version' to the first tag that contains szm-woo-suite.php.
+			'repo'        => 'Yelbow/szm-woo-suite',
+			'version'     => '1.0.15',
+			// Sites that installed it before the rename keep the old folder.
+			'folders'     => array( 'szm-voorraadoverzicht' ),
+			'name'        => __( 'SZM Woo Suite', 'szm-admin-suite' ),
+			'description' => __( 'WooCommerce tools: stock overview dashboard for WooCommerce products.', 'szm-admin-suite' ),
 		),
 		'szm-absolute-positioning' => array(
 			'source'      => 'github',
@@ -371,17 +376,40 @@ function szm_as_dashboard_plugin_state( $slug ) {
 
 /**
  * Find the main plugin file for a slug from the list of installed plugins.
+ *
+ * Looks in the "<slug>/" folder plus any legacy 'folders' of the
+ * recommendation (a renamed plugin keeps its old folder on existing sites).
+ * A folder can hold more than one file with a plugin header (e.g. a compat
+ * loader), so prefer an active file, then "<folder>/<slug>.php", then the
+ * first match.
  */
 function szm_as_dashboard_plugin_file( $slug ) {
 	if ( ! function_exists( 'get_plugins' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 	}
-	foreach ( get_plugins() as $file => $data ) {
-		if ( 0 === strpos( $file, $slug . '/' ) ) {
+	$recs    = szm_as_dashboard_get_recommendations();
+	$folders = array( $slug );
+	if ( isset( $recs[ $slug ]['folders'] ) && is_array( $recs[ $slug ]['folders'] ) ) {
+		$folders = array_merge( $folders, $recs[ $slug ]['folders'] );
+	}
+
+	$candidates = array();
+	foreach ( array_keys( get_plugins() ) as $file ) {
+		foreach ( $folders as $folder ) {
+			if ( 0 === strpos( $file, $folder . '/' ) ) {
+				$candidates[] = $file;
+			}
+		}
+	}
+	foreach ( $candidates as $file ) {
+		if ( is_plugin_active( $file ) ) {
 			return $file;
 		}
 	}
-	return '';
+	if ( in_array( $slug . '/' . $slug . '.php', $candidates, true ) ) {
+		return $slug . '/' . $slug . '.php';
+	}
+	return $candidates ? $candidates[0] : '';
 }
 
 function szm_as_dashboard_ajax_plugin_action() {
