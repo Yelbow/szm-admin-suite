@@ -42,6 +42,7 @@ szm_as_register_module( array(
 			'szm_as_dashboard_recommendations',
 		),
 		'suppress_notices' => true,
+		'yoast_promos'     => true,
 	),
 	'tab_title'       => __( 'Declutter', 'szm-admin-suite' ),
 	'render'          => 'szm_as_declutter_render',
@@ -66,6 +67,16 @@ function szm_as_declutter_boot( $settings = array() ) {
 	// that function. Hook the same action at the latest possible priority
 	// so we run after every one of them, regardless of the priority they used.
 	add_action( 'wp_dashboard_setup', 'szm_as_declutter_sync', PHP_INT_MAX );
+
+	// Yoast's AI upsells (the "Vastgelopen met wat je hierna moet schrijven?"
+	// Content Planner card injected into the editor canvas, AI sparks nudges)
+	// are not admin notices, so the buffer below never sees them. Force
+	// Yoast's own AI switch off while this is enabled, and hide the card as a
+	// fallback in case Yoast renders it anyway.
+	if ( ! isset( $settings['yoast_promos'] ) || ! empty( $settings['yoast_promos'] ) ) {
+		add_filter( 'option_wpseo', 'szm_as_declutter_yoast_ai_off' );
+		add_action( 'enqueue_block_assets', 'szm_as_declutter_yoast_promo_css' );
+	}
 
 	// Notice suppression: never during AJAX/REST (no notice markup renders
 	// there anyway, and buffering an AJAX response is asking for trouble).
@@ -94,6 +105,22 @@ function szm_as_declutter_boot( $settings = array() ) {
 	// thing one priority earlier instead. It only ever runs on plugins.php,
 	// which is never the Updates screen, so this is safe unconditionally.
 	add_action( 'load-plugins.php', 'szm_as_declutter_remove_plugin_update_rows', 19 );
+}
+
+function szm_as_declutter_yoast_ai_off( $value ) {
+	if ( is_array( $value ) ) {
+		$value['enable_ai_generator'] = false;
+	}
+	return $value;
+}
+
+function szm_as_declutter_yoast_promo_css() {
+	if ( ! is_admin() ) {
+		return;
+	}
+	wp_register_style( 'szm-as-declutter-yoast', false, array(), SZM_AS_VERSION );
+	wp_enqueue_style( 'szm-as-declutter-yoast' );
+	wp_add_inline_style( 'szm-as-declutter-yoast', '.wp-block:has(> .yst-root .yst-ai-gradient-border){display:none!important}' );
 }
 
 function szm_as_declutter_remove_plugin_update_rows() {
@@ -270,6 +297,7 @@ function szm_as_declutter_sanitize( $input, $current ) {
 		// Checkbox: absent from $input entirely when unchecked, so this
 		// correctly turns it off rather than falling back to the default.
 		'suppress_notices' => ! empty( $input['suppress_notices'] ),
+		'yoast_promos'     => ! empty( $input['yoast_promos'] ),
 	);
 }
 
@@ -288,6 +316,15 @@ function szm_as_declutter_render( $settings ) {
 		<?php esc_html_e( 'Hide non-essential plugin notices (promo/upsell banners) admin-wide', 'szm-admin-suite' ); ?>
 	</label>
 	<p class="description"><?php esc_html_e( 'Real errors always stay visible. Promo/upsell banners plugins print on their own initiative (e.g. "X Pro is here") get stripped everywhere. WordPress\'s own update/security nags, and the Plugins list\'s "update available" row, are also hidden outside the Updates screen — so they only show up where you\'d actually go to act on them.', 'szm-admin-suite' ); ?></p>
+
+	<h3><?php esc_html_e( 'Yoast promos', 'szm-admin-suite' ); ?></h3>
+	<label style="display:block; margin-bottom:12px;">
+		<input type="checkbox"
+			name="<?php echo esc_attr( SZM_AS_OPTION ); ?>[declutter][yoast_promos]"
+			value="1"
+			<?php checked( ! isset( $settings['yoast_promos'] ) || ! empty( $settings['yoast_promos'] ) ); ?> />
+		<?php esc_html_e( 'Hide Yoast AI upsells in the editor (Content Planner card, AI nudges)', 'szm-admin-suite' ); ?>
+	</label>
 
 	<h3><?php esc_html_e( 'Dashboard widgets', 'szm-admin-suite' ); ?></h3>
 	<p><?php esc_html_e( 'Every dashboard widget not ticked here starts unchecked in each user\'s Screen Options — including new ones added later by a freshly installed plugin. Users can still tick any widget back on for themselves; we never override a choice they\'ve already made. Site Health always stays visible.', 'szm-admin-suite' ); ?></p>
